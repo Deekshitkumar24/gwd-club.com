@@ -1,0 +1,45 @@
+.page { padding-top: 120px; }
+
+.header { padding: var(--space-4xl) 0 var(--space-3xl); }
+.headerInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.headerTitle { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: var(--space-lg); }
+.headerDesc { font-size: var(--text-lg); color: var(--color-text-secondary); max-width: 600px; line-height: 1.7; }
+
+.teamSection { padding: var(--space-2xl) 0 var(--space-5xl); }
+.teamInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); display: flex; flex-direction: column; gap: var(--space-4xl); }
+
+.level {}
+.levelHeader { display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--space-lg); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-xl); }
+.levelLabel { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; }
+.levelCount { font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-xl); }
+.gridLeadership { grid-template-columns: repeat(2, 1fr); max-width: 800px; }
+
+.card { display: flex; flex-direction: column; gap: var(--space-md); transition: transform var(--duration-fast) var(--ease-out); }
+.card:hover { transform: translateY(-4px); }
+
+.cardLeadership { gap: var(--space-lg); }
+
+.cardImage { position: relative; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 3/4; }
+.cardImage img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-slow) var(--ease-out); }
+.card:hover .cardImage img { transform: scale(1.05); }
+.cardImageOverlay { position: absolute; bottom: 0; left: 0; right: 0; height: 40%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); opacity: 0; transition: opacity var(--duration-fast); }
+.card:hover .cardImageOverlay { opacity: 1; }
+
+.cardBody { display: flex; flex-direction: column; gap: 0.25rem; }
+.cardName { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; transition: color var(--duration-fast); }
+.card:hover .cardName { color: var(--color-accent); }
+.cardRole { font-size: var(--text-sm); color: var(--color-text-tertiary); }
+.cardBio { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-top: var(--space-sm); }
+.cardSkills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-sm); }
+.cardSkill { font-size: 0.6875rem; padding: 0.2rem 0.5rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-full); color: var(--color-text-tertiary); }
+
+@media (max-width: 768px) {
+  .gridLeadership { grid-template-columns: 1fr; max-width: 100%; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}

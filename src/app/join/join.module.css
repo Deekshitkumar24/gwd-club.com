@@ -1,0 +1,55 @@
+.page { padding-top: 120px; }
+
+.header { padding: var(--space-4xl) 0 var(--space-3xl); }
+.headerInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.headerTitle { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: var(--space-lg); }
+.headerDesc { font-size: var(--text-lg); color: var(--color-text-secondary); max-width: 600px; line-height: 1.7; }
+
+.sectionTitle { font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-xl); }
+
+/* Why Join */
+.whySection { padding: var(--space-3xl) 0 var(--space-4xl); }
+.whyInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.whyGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-xl); }
+.whyCard { padding: var(--space-xl); border: 1px solid var(--color-border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), transform var(--duration-fast); }
+.whyCard:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+.whyCardTitle { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; margin-bottom: var(--space-sm); }
+.whyCardDesc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; }
+
+/* Members Section */
+.membersSection { padding: var(--space-4xl) 0; background: var(--color-bg-elevated); }
+.membersInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.membersList { display: flex; flex-direction: column; }
+.memberItem { display: flex; align-items: baseline; gap: var(--space-lg); padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-border); }
+.memberNumber { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--color-accent); min-width: 30px; }
+.memberText { font-size: var(--text-base); color: var(--color-text-secondary); }
+
+/* Form */
+.formSection { padding: var(--space-4xl) 0; }
+.formInner { max-width: 700px; margin: 0 auto; padding: 0 var(--gutter); }
+.formDesc { font-size: var(--text-base); color: var(--color-text-secondary); margin-bottom: var(--space-2xl); line-height: 1.7; }
+.form { display: flex; flex-direction: column; gap: var(--space-lg); }
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); }
+
+.success { text-align: center; padding: var(--space-3xl) 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
+.successIcon { width: 64px; height: 64px; border-radius: 50%; background: rgba(52, 199, 89, 0.15); color: var(--color-success); font-size: 2rem; display: flex; align-items: center; justify-content: center; }
+.successTitle { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; }
+.successDesc { font-size: var(--text-base); color: var(--color-text-secondary); }
+
+/* FAQ */
+.faqSection { padding: var(--space-4xl) 0 var(--space-5xl); background: var(--color-bg-elevated); }
+.faqInner { max-width: 700px; margin: 0 auto; padding: 0 var(--gutter); }
+.faqList { display: flex; flex-direction: column; }
+.faqItem { border-bottom: 1px solid var(--color-border); }
+.faqQuestion { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: var(--space-md) 0; font-size: var(--text-base); font-weight: 500; text-align: left; color: var(--color-text-primary); transition: color var(--duration-fast); }
+.faqQuestion:hover { color: var(--color-accent); }
+.faqIcon { font-size: var(--text-xl); transition: transform var(--duration-fast); }
+.faqIconOpen { transform: rotate(45deg); }
+.faqAnswer { max-height: 0; overflow: hidden; transition: max-height var(--duration-normal) var(--ease-out); }
+.faqAnswerOpen { max-height: 200px; }
+.faqAnswer p { padding-bottom: var(--space-md); font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .whyGrid { grid-template-columns: 1fr; }
+  .formRow { grid-template-columns: 1fr; }
+}

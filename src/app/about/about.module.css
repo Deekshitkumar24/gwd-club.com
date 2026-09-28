@@ -1,0 +1,53 @@
+.page { padding-top: 120px; }
+
+.header { padding: var(--space-4xl) 0 var(--space-3xl); }
+.headerInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.headerTitle { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: var(--space-lg); }
+.headerDesc { font-size: var(--text-lg); color: var(--color-text-secondary); max-width: 700px; line-height: 1.7; }
+
+.sectionTitle { font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-2xl); }
+
+/* Stats */
+.stats { padding: var(--space-3xl) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+.statsInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-xl); }
+.statItem { text-align: center; }
+.statValue { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 700; line-height: 1; }
+.statLabel { font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-tertiary); margin-top: var(--space-sm); }
+
+/* Mission */
+.missionSection { padding: var(--space-4xl) 0; }
+.missionInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+.missionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3xl); }
+.missionBlock { padding: var(--space-2xl); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.missionTitle { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; margin-bottom: var(--space-md); color: var(--color-accent); }
+.missionBody { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.7; }
+
+/* Timeline */
+.historySection { padding: var(--space-4xl) 0 var(--space-5xl); background: var(--color-bg-elevated); }
+.historyInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+
+.timelineItems { display: flex; flex-direction: column; position: relative; padding-left: 60px; }
+.timelineItems::before { content: ''; position: absolute; left: 23px; top: 0; bottom: 0; width: 1px; background: var(--color-border); }
+
+.timelineItem { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2xl); padding: var(--space-2xl) 0; position: relative; }
+.timelineDot { position: absolute; left: -37px; top: calc(var(--space-2xl) + 6px); width: 10px; height: 10px; border-radius: 50%; background: var(--color-bg); border: 2px solid var(--color-text-muted); z-index: 1; transition: all var(--duration-fast); }
+.timelineItemVisible .timelineDot { background: var(--color-accent); border-color: var(--color-accent); box-shadow: 0 0 0 4px var(--color-accent-subtle); }
+
+.timelineContent { display: flex; flex-direction: column; gap: var(--space-sm); }
+.timelineYear { font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); }
+.timelineItemVisible .timelineYear { color: var(--color-accent); }
+.timelineTitle { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; }
+.timelineDesc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.7; }
+.timelineAchievement { font-size: var(--text-xs); font-weight: 600; color: var(--color-accent); }
+
+.timelineImage { border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 4/3; }
+.timelineImage img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 768px) {
+  .statsInner { grid-template-columns: repeat(3, 1fr); }
+  .missionGrid { grid-template-columns: 1fr; }
+  .timelineItem { grid-template-columns: 1fr; }
+  .timelineItems { padding-left: 40px; }
+  .timelineItems::before { left: 13px; }
+  .timelineDot { left: -27px; }
+}
