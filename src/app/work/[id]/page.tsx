@@ -11,7 +11,7 @@ import styles from './projectDetail.module.css';
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { store } = useCms();
-  const allProjects = store.projects?.length ? store.projects : PROJECTS;
+  const allProjects = (store.projects ?? []).filter((p) => !p.status || p.status === 'Published');
   const projectIndex = allProjects.findIndex((p) => p.id === id);
   const project = allProjects[projectIndex];
 

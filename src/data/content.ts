@@ -295,6 +295,7 @@ export interface CollaborationItem {
   logo: string;
   image: string;
   featured: boolean;
+  status?: 'Published' | 'Draft' | 'Archived';
 }
 
 export const COLLABORATIONS: CollaborationItem[] = [
@@ -407,6 +408,7 @@ export interface LeaderSlot {
   socials?: Record<string, string>;
   projects?: string[];
   tier?: string;
+  status?: 'Published' | 'Draft' | 'Archived';
 }
 
 export const NINE_LEADERS: LeaderSlot[] = [
@@ -709,6 +711,7 @@ export interface ProjectItem {
   partners?: string[];
   link?: string;
   featured?: boolean;
+  status?: 'Published' | 'Draft' | 'Archived';
 }
 
 export const PROJECTS: ProjectItem[] = [
@@ -812,6 +815,7 @@ export interface Milestone {
   highlighted?: boolean;
   achievement: string;
   image: string;
+  status?: 'Published' | 'Draft' | 'Archived';
 }
 
 export const TIMELINE: Milestone[] = [
@@ -998,6 +1002,7 @@ export interface GalleryImage {
   caption: string;
   category: string;
   featured?: boolean;
+  status?: 'Published' | 'Draft' | 'Archived';
 }
 
 export const GALLERY_IMAGES: GalleryImage[] = [

@@ -17,7 +17,7 @@ export default function WorkPage() {
   const [selectedYear, setSelectedYear] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const projects = store.projects?.length ? store.projects : PROJECTS;
+  const projects = (store.projects ?? []).filter((p) => !p.status || p.status === 'Published');
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -160,7 +160,7 @@ export default function WorkPage() {
           </div>
 
           <div className={styles.transformGrid}>
-            {PROJECTS.filter((p) => p.beforeImage && p.afterImage).slice(0, 2).map((project) => (
+            {projects.filter((p) => p.beforeImage && p.afterImage).slice(0, 2).map((project) => (
               <div key={project.id} className={styles.transformItem}>
                 <BorderBeam size={240} duration={12} colorFrom="#E11D48" colorTo="#F59E0B" borderWidth={1.5} />
                 <BeforeAfterCard

@@ -101,7 +101,7 @@ export default function WorkflowPage() {
   const { ref: headerRef, isVisible: isHeaderVisible } = useReveal();
   const [activeStep, setActiveStep] = useState(0);
 
-  const publishedCmsSteps = (store.workflow || []).filter((w) => w.status === 'Published');
+  const publishedCmsSteps = (store.workflow ?? []).filter((w) => !w.status || w.status === 'Published');
   const activeSteps =
     publishedCmsSteps.length > 0
       ? publishedCmsSteps.map((s) => ({
@@ -112,6 +112,8 @@ export default function WorkflowPage() {
           description: s.summary,
           deliverables: s.deliverables,
         }))
+      : store.workflow && store.workflow.length > 0
+      ? []
       : WORKFLOW_STEPS;
 
   useEffect(() => {
@@ -162,15 +164,21 @@ export default function WorkflowPage() {
       {/* Workflow Stepper */}
       <section className={styles.workflowSection}>
         <div className={styles.workflowInner}>
-          <div className={styles.stepperTrack}>
-            {activeSteps.map((step, index) => {
-              const isCurrent = activeStep === index;
-              return (
-                <div
-                  key={step.number}
-                  className={styles.stepRow}
-                  data-step-index={index}
-                >
+          {activeSteps.length === 0 ? (
+            <div style={{ padding: '4rem 1.5rem', textAlign: 'center', background: '#121212', borderRadius: '16px', border: '1px solid #222', color: '#999', margin: '2rem 0' }}>
+              <p style={{ margin: 0, fontSize: '1.1rem', color: '#bbb' }}>No execution phases are currently published.</p>
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#666' }}>Updates to the collective methodology will appear here.</p>
+            </div>
+          ) : (
+            <div className={styles.stepperTrack}>
+              {activeSteps.map((step, index) => {
+                const isCurrent = activeStep === index;
+                return (
+                  <div
+                    key={step.number}
+                    className={styles.stepRow}
+                    data-step-index={index}
+                  >
                   <div className={`${styles.stepNode} ${isCurrent ? styles.stepNodeActive : ''}`}>
                     {step.number}
                   </div>
@@ -205,8 +213,9 @@ export default function WorkflowPage() {
               );
             })}
           </div>
-        </div>
-      </section>
+        )}
+      </div>
+    </section>
 
       {/* CTA Section */}
       <section className={styles.ctaSection}>

@@ -19,7 +19,7 @@ export default function RegisterPage({ params }: { params: Promise<{ id: string 
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [registrationId, setRegistrationId] = useState<string>('');
 
-  const upcomingList = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
+  const upcomingList = (store.upcomingEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
   const event = upcomingList.find((e) => e.id === id);
   if (!event) return notFound();
 

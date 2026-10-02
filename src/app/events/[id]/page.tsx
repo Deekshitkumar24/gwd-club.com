@@ -13,14 +13,15 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const { store } = useCms();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const allEvents = [...(store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS), ...(store.pastEvents?.length ? store.pastEvents : PAST_EVENTS)];
+  const upcomingList = (store.upcomingEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
+  const pastList = (store.pastEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
+  const allEvents = [...upcomingList, ...pastList];
   const event = allEvents.find((e) => e.id === id);
   if (!event) return notFound();
 
-  const upcomingList = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
-  const isUpcoming = upcomingList.some(e => e.id === id);
-  const upcomingEvent = isUpcoming ? upcomingList.find(e => e.id === id) : null;
-  const pastEvent = !isUpcoming ? (store.pastEvents?.length ? store.pastEvents : PAST_EVENTS).find(e => e.id === id) : null;
+  const isUpcoming = upcomingList.some((e) => e.id === id);
+  const upcomingEvent = isUpcoming ? upcomingList.find((e) => e.id === id) : null;
+  const pastEvent = !isUpcoming ? pastList.find((e) => e.id === id) : null;
 
   // Authoritative registration state check
   const eventRegistrations = (store.registrations || []).filter(r => r.eventId === id);

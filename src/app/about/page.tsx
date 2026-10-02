@@ -36,9 +36,9 @@ export default function AboutPage() {
 
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
 
-  // Group timeline chapters from store or default
-  const chapters = store.timeline?.length ? store.timeline : TIMELINE;
-  const currentChapter = chapters[activeChapterIndex] || chapters[0];
+  // Group timeline chapters from store
+  const chapters = (store.timeline ?? []).filter((m) => !m.status || m.status === 'Published');
+  const currentChapter = chapters[activeChapterIndex] || chapters[0] || null;
 
   const handleNextChapter = () => {
     setActiveChapterIndex((prev) => (prev + 1 < chapters.length ? prev + 1 : 0));
@@ -249,84 +249,91 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className={styles.spiralContainer}>
-            {/* Spiral Ribbon Navigation */}
-            <div className={styles.spiralRibbon}>
-              <div className={styles.ribbonTrack}>
-                {chapters.map((ch, idx) => {
-                  const isActive = idx === activeChapterIndex;
-                  const distance = Math.abs(idx - activeChapterIndex);
-                  const scale = isActive ? 1.15 : Math.max(0.85, 1 - distance * 0.1);
-                  const opacity = isActive ? 1 : Math.max(0.4, 1 - distance * 0.25);
-
-                  return (
-                    <button
-                      key={ch.year + ch.title}
-                      onClick={() => setActiveChapterIndex(idx)}
-                      className={`${styles.ribbonNode} ${isActive ? styles.ribbonNodeActive : ''}`}
-                      style={{
-                        transform: `scale(${scale})`,
-                        opacity,
-                      }}
-                      aria-label={`View milestone ${ch.year}: ${ch.title}`}
-                    >
-                      <span className={styles.ribbonYear}>{ch.year}</span>
-                      <span className={styles.ribbonDot} />
-                      <span className={styles.ribbonTitleShort}>{ch.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
+          {chapters.length === 0 || !currentChapter ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', border: '1px solid var(--color-border)', margin: '1rem 0' }}>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>No timeline milestones currently published.</p>
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem' }}>Milestones will appear here once added in the CMS.</p>
             </div>
+          ) : (
+            <div className={styles.spiralContainer}>
+              {/* Spiral Ribbon Navigation */}
+              <div className={styles.spiralRibbon}>
+                <div className={styles.ribbonTrack}>
+                  {chapters.map((ch, idx) => {
+                    const isActive = idx === activeChapterIndex;
+                    const distance = Math.abs(idx - activeChapterIndex);
+                    const scale = isActive ? 1.15 : Math.max(0.85, 1 - distance * 0.1);
+                    const opacity = isActive ? 1 : Math.max(0.4, 1 - distance * 0.25);
 
-            {/* Active Chapter Card */}
-            <div className={styles.chapterStage}>
-              <div className={styles.chapterVisual}>
-                <img
-                  src={currentChapter.image}
-                  alt={currentChapter.title}
-                  className={styles.chapterImg}
-                  key={currentChapter.image}
-                />
-                <div className={styles.chapterOverlay}>
-                  <span className={styles.chapterYearBadge}>{currentChapter.year}</span>
+                    return (
+                      <button
+                        key={ch.year + ch.title}
+                        onClick={() => setActiveChapterIndex(idx)}
+                        className={`${styles.ribbonNode} ${isActive ? styles.ribbonNodeActive : ''}`}
+                        style={{
+                          transform: `scale(${scale})`,
+                          opacity,
+                        }}
+                        aria-label={`View milestone ${ch.year}: ${ch.title}`}
+                      >
+                        <span className={styles.ribbonYear}>{ch.year}</span>
+                        <span className={styles.ribbonDot} />
+                        <span className={styles.ribbonTitleShort}>{ch.title}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className={styles.chapterContent}>
-                <div className={styles.chapterControls}>
-                  <button
-                    onClick={handlePrevChapter}
-                    className={styles.ctrlBtn}
-                    aria-label="Previous milestone"
-                  >
-                    ← Previous
-                  </button>
-                  <span className={styles.chapterCounter}>
-                    Milestone {activeChapterIndex + 1} of {chapters.length}
-                  </span>
-                  <button
-                    onClick={handleNextChapter}
-                    className={styles.ctrlBtn}
-                    aria-label="Next milestone"
-                  >
-                    Next →
-                  </button>
-                </div>
-
-                <span className={styles.chapterCategoryLabel}>Milestone Focus</span>
-                <h3 className={styles.chapterTitle}>{currentChapter.title}</h3>
-                <p className={styles.chapterDesc}>{currentChapter.description}</p>
-
-                {currentChapter.achievement && (
-                  <div className={styles.chapterAchievement}>
-                    <span className={styles.achievementIcon}>✦</span>
-                    <span>{currentChapter.achievement}</span>
+              {/* Active Chapter Card */}
+              <div className={styles.chapterStage}>
+                <div className={styles.chapterVisual}>
+                  <img
+                    src={currentChapter.image}
+                    alt={currentChapter.title}
+                    className={styles.chapterImg}
+                    key={currentChapter.image}
+                  />
+                  <div className={styles.chapterOverlay}>
+                    <span className={styles.chapterYearBadge}>{currentChapter.year}</span>
                   </div>
-                )}
+                </div>
+
+                <div className={styles.chapterContent}>
+                  <div className={styles.chapterControls}>
+                    <button
+                      onClick={handlePrevChapter}
+                      className={styles.ctrlBtn}
+                      aria-label="Previous milestone"
+                    >
+                      ← Previous
+                    </button>
+                    <span className={styles.chapterCounter}>
+                      Milestone {activeChapterIndex + 1} of {chapters.length}
+                    </span>
+                    <button
+                      onClick={handleNextChapter}
+                      className={styles.ctrlBtn}
+                      aria-label="Next milestone"
+                    >
+                      Next →
+                    </button>
+                  </div>
+
+                  <span className={styles.chapterCategoryLabel}>Milestone Focus</span>
+                  <h3 className={styles.chapterTitle}>{currentChapter.title}</h3>
+                  <p className={styles.chapterDesc}>{currentChapter.description}</p>
+
+                  {currentChapter.achievement && (
+                    <div className={styles.chapterAchievement}>
+                      <span className={styles.achievementIcon}>✦</span>
+                      <span>{currentChapter.achievement}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

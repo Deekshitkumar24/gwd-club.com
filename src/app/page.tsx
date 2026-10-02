@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useReveal, useCountUp } from '@/hooks/useAnimations';
 import { useCms } from '@/context/CmsContext';
+import { getEventRegistrationState } from '@/lib/cms';
 import {
   CLUB,
   STATS,
@@ -78,27 +79,48 @@ export default function HomePage() {
   const statsReveal = useReveal();
   const ctaReveal = useReveal();
 
+  const publishedEvents = (store.upcomingEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
   const featuredEvent =
-    store.upcomingEvents.find((e) => e.id === store.homepage.featuredEventId) ||
-    store.upcomingEvents.find((e) => e.featured) ||
-    store.upcomingEvents[0] ||
-    UPCOMING_EVENTS[0];
+    publishedEvents.find((e) => e.id === store.homepage.featuredEventId) ||
+    publishedEvents.find((e) => e.featured) ||
+    publishedEvents[0] ||
+    null;
 
+  const featuredEventRegistrationsCount = featuredEvent
+    ? (store.registrations ?? []).filter((r) => r.eventId === featuredEvent.id).length
+    : 0;
+  const eventRegState = featuredEvent
+    ? getEventRegistrationState(featuredEvent, featuredEventRegistrationsCount)
+    : null;
+  const isRegOpen = eventRegState === 'Registration Open';
+  const eventDateObj = featuredEvent?.date ? new Date(featuredEvent.date) : null;
+  const monthStr = eventDateObj && !isNaN(eventDateObj.getTime())
+    ? eventDateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+    : 'GWD';
+  const dayStr = eventDateObj && !isNaN(eventDateObj.getTime())
+    ? String(eventDateObj.getDate())
+    : 'LIVE';
+
+  const publishedLeaders = (store.leaders ?? []).filter((l) => !l.status || l.status === 'Published');
   const president =
-    store.leaders.find((l) => l.id === store.homepage.leadershipHighlightId) ||
-    store.leaders[0] ||
-    NINE_LEADERS[0];
+    publishedLeaders.find((l) => l.id === store.homepage.leadershipHighlightId) ||
+    publishedLeaders[0] ||
+    null;
 
+  const publishedProjects = (store.projects ?? []).filter((p) => !p.status || p.status === 'Published');
   const featuredProjects = (
-    store.projects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured).length > 0
-      ? store.projects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured)
-      : store.projects
+    publishedProjects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured).length > 0
+      ? publishedProjects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured)
+      : publishedProjects
   ).slice(0, 3);
 
+  const publishedCollabs = (store.collaborations ?? []).filter((c) => !c.status || c.status === 'Published');
   const featuredCollab =
-    store.collaborations.find((c) => c.id === store.homepage.featuredCollaborationId) ||
-    store.collaborations[0] ||
-    COLLABORATIONS[0];
+    publishedCollabs.find((c) => c.id === store.homepage.featuredCollaborationId) ||
+    publishedCollabs[0] ||
+    null;
+
+  const publishedTimeline = (store.timeline ?? []).filter((m) => !m.status || m.status === 'Published');
 
   // ── Scroll lock / unlock helpers ──
   const unlockScroll = useCallback(() => {
@@ -399,9 +421,15 @@ export default function HomePage() {
               </div>
 
               <h1 className={styles.mainTitle}>
-                <span className={styles.redHighlight}>GET WORK</span>
-                <br />
-                DONE.
+                {heroCms.headline ? (
+                  <span style={{ whiteSpace: 'pre-line' }}>{heroCms.headline}</span>
+                ) : (
+                  <>
+                    <span className={styles.redHighlight}>GET WORK</span>
+                    <br />
+                    DONE.
+                  </>
+                )}
               </h1>
 
               <p className={styles.mainSubtitle}>
@@ -538,7 +566,7 @@ export default function HomePage() {
 
             {/* Milestones Horizontal Row */}
             <div className={styles.milestonesTrack}>
-              {store.timeline.slice(0, 4).map((m) => (
+              {publishedTimeline.slice(0, 4).map((m) => (
                 <div
                   key={m.title}
                   className={`${styles.milestoneCard} ${m.highlighted ? styles.milestoneCardActive : ''}`}
@@ -665,6 +693,14 @@ export default function HomePage() {
           </div>
 
           <div className={styles.workAsymmetricGrid}>
+            {featuredProjects.length === 0 && (
+              <div style={{ gridColumn: '1 / -1', padding: '3rem 1.5rem', textAlign: 'center', background: '#121212', borderRadius: '16px', border: '1px solid #222', color: '#999' }}>
+                <p style={{ margin: 0, fontSize: '1rem', color: '#bbb' }}>No projects currently published in the showcase.</p>
+                <Link href="/work" style={{ color: 'var(--brand-red)', display: 'inline-block', marginTop: '0.75rem', fontWeight: 600 }}>
+                  View All Archives &rarr;
+                </Link>
+              </div>
+            )}
             {/* Dominant Featured Project */}
             {featuredProjects[0] && (
               <div className={styles.dominantProjectCard} style={{ position: 'relative', overflow: 'hidden' }}>
@@ -773,7 +809,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {featuredEvent && (
+          {featuredEvent ? (
             <div className={`${styles.eventFeatureBanner} reveal ${eventReveal.isVisible ? 'visible' : ''}`}>
               <div className={styles.eventBannerMediaCol}>
                 <img
@@ -784,18 +820,28 @@ export default function HomePage() {
                 <div className={styles.eventBannerCategoryBadge}>
                   {featuredEvent.category}
                 </div>
-                <div className={styles.eventLiveStatusBadge}>
-                  <span className={styles.livePulseDot} />
-                  <span>REGISTRATIONS OPEN</span>
+                <div
+                  className={styles.eventLiveStatusBadge}
+                  style={{
+                    background: isRegOpen ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                    borderColor: isRegOpen ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+                    color: isRegOpen ? '#4ade80' : '#f87171',
+                  }}
+                >
+                  <span
+                    className={styles.livePulseDot}
+                    style={{ background: isRegOpen ? '#22c55e' : '#ef4444' }}
+                  />
+                  <span>{isRegOpen ? 'REGISTRATIONS OPEN' : eventRegState ? eventRegState.toUpperCase() : 'REGISTRATIONS CLOSED'}</span>
                 </div>
                 <div className={styles.eventVisualBottomBar}>
                   <div className={styles.dateBlock}>
-                    <span className={styles.dateBlockMonth}>NOV</span>
-                    <span className={styles.dateBlockDay}>22</span>
+                    <span className={styles.dateBlockMonth}>{monthStr}</span>
+                    <span className={styles.dateBlockDay}>{dayStr}</span>
                   </div>
                   <div className={styles.visualMetaText}>
-                    <span className={styles.visualMetaTitle}>VJIT Campus · Hyderabad</span>
-                    <span className={styles.visualMetaSub}>Annual Builder Showcase & Hackathon</span>
+                    <span className={styles.visualMetaTitle}>{featuredEvent.location}</span>
+                    <span className={styles.visualMetaSub}>{featuredEvent.title}</span>
                   </div>
                 </div>
               </div>
@@ -830,22 +876,39 @@ export default function HomePage() {
                     <span className={styles.metaIcon}>⚡</span>
                     <div>
                       <span className={styles.metaLabel}>EVENT TRACKS</span>
-                      <span className={styles.metaValue}>Full-Stack • Design • Sports OS</span>
+                      <span className={styles.metaValue}>Full-Stack • Design • Systems</span>
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.eventActionRow}>
-                  <Link href={`/events/${featuredEvent.id}/register`} className={styles.btnEventRegister}>
-                    <span>Register for Event</span>
-                    <span>→</span>
-                  </Link>
+                  {isRegOpen ? (
+                    <Link href={`/events/${featuredEvent.id}/register`} className={styles.btnEventRegister}>
+                      <span>Register for Event</span>
+                      <span>→</span>
+                    </Link>
+                  ) : (
+                    <span
+                      className={styles.btnEventRegister}
+                      style={{ opacity: 0.5, cursor: 'not-allowed', background: '#262626' }}
+                      title="Registrations are currently closed"
+                    >
+                      <span>{eventRegState || 'Registration Closed'}</span>
+                    </span>
+                  )}
                   <Link href={`/events/${featuredEvent.id}`} className={styles.btnEventDetails}>
                     <span>Full Schedule & Details</span>
                     <span>↗</span>
                   </Link>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#121212', borderRadius: '16px', border: '1px solid #222', color: '#999' }}>
+              <p style={{ margin: 0, fontSize: '1rem', color: '#bbb' }}>No upcoming events scheduled at this time.</p>
+              <Link href="/events" style={{ color: 'var(--brand-red)', display: 'inline-block', marginTop: '0.75rem', fontWeight: 600 }}>
+                View Past Event Archives &rarr;
+              </Link>
             </div>
           )}
         </div>
@@ -864,39 +927,41 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className={`${styles.presidentFeatureCard} reveal ${leaderReveal.isVisible ? 'visible' : ''}`}>
-            <div className={styles.presidentPortraitCol}>
-              <div className={styles.portraitWrap}>
-                <img
-                  src={president.photo || '/team/president.jpg'}
-                  alt={president.name}
-                  className={styles.presidentImg}
-                />
-                <div className={styles.portraitTag}>CLUB LEADERSHIP · SLOT 01</div>
+          {president && (
+            <div className={`${styles.presidentFeatureCard} reveal ${leaderReveal.isVisible ? 'visible' : ''}`}>
+              <div className={styles.presidentPortraitCol}>
+                <div className={styles.portraitWrap}>
+                  <img
+                    src={president.photo || '/team/president.jpg'}
+                    alt={president.name}
+                    className={styles.presidentImg}
+                  />
+                  <div className={styles.portraitTag}>CLUB LEADERSHIP · SLOT 01</div>
+                </div>
+              </div>
+
+              <div className={styles.presidentDetailsCol}>
+                <span className={styles.leaderRoleChip}>{president.role} · GWD Club</span>
+                <h3 className={styles.presidentName}>{president.name}</h3>
+                <p className={styles.presidentBio}>{president.bio}</p>
+
+                {president.quote && (
+                  <blockquote className={styles.presidentQuoteBox}>
+                    &ldquo;{president.quote}&rdquo;
+                  </blockquote>
+                )}
+
+                <div className={styles.leaderCtaRow}>
+                  <Link href="/team" className={styles.btnFullHierarchy}>
+                    Meet the Full Team →
+                  </Link>
+                  <Link href="/explore" className={styles.btnSecondary} style={{ display: 'inline-flex' }}>
+                    Explore Working Domains
+                  </Link>
+                </div>
               </div>
             </div>
-
-            <div className={styles.presidentDetailsCol}>
-              <span className={styles.leaderRoleChip}>{president.role} · GWD Club</span>
-              <h3 className={styles.presidentName}>{president.name}</h3>
-              <p className={styles.presidentBio}>{president.bio}</p>
-
-              {president.quote && (
-                <blockquote className={styles.presidentQuoteBox}>
-                  &ldquo;{president.quote}&rdquo;
-                </blockquote>
-              )}
-
-              <div className={styles.leaderCtaRow}>
-                <Link href="/team" className={styles.btnFullHierarchy}>
-                  Meet the Full Team →
-                </Link>
-                <Link href="/explore" className={styles.btnSecondary} style={{ display: 'inline-flex' }}>
-                  Explore Working Domains
-                </Link>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -927,7 +992,7 @@ export default function HomePage() {
               theme="light"
               height={220}
             />
-            {store.collaborations.slice(0, 2).map((c) => (
+            {publishedCollabs.slice(0, 2).map((c) => (
               <div key={c.name} className={styles.collabCard}>
                 <div className={styles.collabTopRow}>
                   <span className={styles.collabTypeBadge}>{c.type}</span>

@@ -36,8 +36,8 @@ export default function TeamPage() {
   const councilReveal = useReveal();
   const coreReveal = useReveal();
 
-  const leaders = store.leaders?.length ? store.leaders : NINE_LEADERS;
-  const president = leaders[0] || NINE_LEADERS[0];
+  const leaders = (store.leaders ?? []).filter((l) => !l.status || l.status === 'Published');
+  const president = leaders[0] || null;
   const remainingLeaders = leaders.slice(1);
 
   return (
@@ -101,16 +101,20 @@ export default function TeamPage() {
           </div>
 
           {/* Slot 01: President Hero Showcase */}
-          <div className={styles.presidentHero}>
-            <PresidentCard member={president} />
-          </div>
+          {president && (
+            <div className={styles.presidentHero}>
+              <PresidentCard member={president} />
+            </div>
+          )}
 
           {/* Slots 02–09: Remaining Executive Council */}
-          <div className={styles.councilGrid}>
-            {remainingLeaders.map((leader, i) => (
-              <LeaderCard key={leader.id} leader={leader} index={i + 2} />
-            ))}
-          </div>
+          {remainingLeaders.length > 0 && (
+            <div className={styles.councilGrid}>
+              {remainingLeaders.map((leader, i) => (
+                <LeaderCard key={leader.id} leader={leader} index={i + 2} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

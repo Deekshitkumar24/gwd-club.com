@@ -7,6 +7,13 @@ import styles from './contact.module.css';
 
 export default function ContactPage() {
   const { store, addMessage } = useCms();
+  const settings = store.settings;
+  const companyName = settings?.companyName || CLUB.companyName;
+  const registeredOffice = settings?.hq || CLUB.registeredOffice;
+  const cin = settings?.cin || CLUB.cin;
+  const gstin = settings?.gstin || CLUB.gstin;
+  const generalEmail = settings?.email || 'hello@gwd-club.com';
+
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [msgRef, setMsgRef] = useState<string>('');
 
@@ -62,11 +69,11 @@ export default function ContactPage() {
             <div className={styles.infoCol}>
               <div className={styles.infoCard}>
                 <span className={styles.cardBadge}>Corporate Headquarters</span>
-                <h3 className={styles.cardTitle}>{CLUB.companyName}</h3>
-                <p className={styles.cardText}>{CLUB.registeredOffice}</p>
+                <h3 className={styles.cardTitle}>{companyName}</h3>
+                <p className={styles.cardText}>{registeredOffice}</p>
                 <div className={styles.metaRow}>
-                  <span>CIN: {CLUB.cin}</span>
-                  <span>GSTIN: {CLUB.gstin}</span>
+                  <span>CIN: {cin}</span>
+                  <span>GSTIN: {gstin}</span>
                 </div>
               </div>
 
@@ -86,7 +93,7 @@ export default function ContactPage() {
                 <div className={styles.channelList}>
                   <div className={styles.channelItem}>
                     <span className={styles.channelKey}>General</span>
-                    <span className={styles.channelVal}>hello@gwd-club.com</span>
+                    <span className={styles.channelVal}>{generalEmail}</span>
                   </div>
                   <div className={styles.channelItem}>
                     <span className={styles.channelKey}>Enterprise & Ventures</span>

@@ -9,7 +9,7 @@ import { DyeAtmosphereTransition } from '@/components/DyeVisual';
 import styles from './join.module.css';
 
 export default function JoinPage() {
-  const { addApplication } = useCms();
+  const { store, addApplication } = useCms();
   const headerReveal = useReveal();
   const whyReveal = useReveal();
   const formReveal = useReveal();
@@ -36,6 +36,15 @@ export default function JoinPage() {
 
     if (!name || !email || !why) {
       setErrorMessage('Please fill in all required fields.');
+      return;
+    }
+
+    const existing = (store.applications ?? []).find(
+      (a) => a.email.toLowerCase() === email && a.domain.toLowerCase() === domain.toLowerCase()
+    );
+    if (existing) {
+      setErrorMessage(`An application for ${domain} with email "${email}" has already been submitted (Status: ${existing.status}). Please await administrative review.`);
+      setFormState('error');
       return;
     }
 

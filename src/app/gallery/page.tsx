@@ -10,7 +10,7 @@ import styles from './gallery.module.css';
 
 export default function GalleryPage() {
   const { store } = useCms();
-  const galleryImages = store.gallery && store.gallery.length > 0 ? store.gallery : GALLERY_IMAGES;
+  const galleryImages = (store.gallery ?? []).filter((i) => !i.status || i.status === 'Published');
   const [activeCategory, setActiveCategory] = useState('all');
   const [lightbox, setLightbox] = useState<number | null>(null);
 
@@ -59,25 +59,32 @@ export default function GalleryPage() {
             </div>
           </div>
 
-          <div className={styles.grid}>
-            {filtered.map((img, i) => (
-              <div
-                key={img.id || i}
-                className={styles.gridItem}
-                onClick={() => setLightbox(i)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && setLightbox(i)}
-              >
-                <img src={img.src} alt={img.caption} loading="lazy" />
-                <BorderBeam size={180} duration={14} colorFrom="#E11D48" colorTo="#8B5CF6" borderWidth={1} />
-                <div className={styles.gridItemOverlay}>
-                  <span className={styles.gridCategoryBadge}>{img.category}</span>
-                  <p className={styles.gridItemCaption}>{img.caption}</p>
+          {filtered.length === 0 ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', border: '1px solid var(--color-border)', margin: '1rem 0' }}>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>No photographic records found in this category.</p>
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem' }}>Select another category or check back soon.</p>
+            </div>
+          ) : (
+            <div className={styles.grid}>
+              {filtered.map((img, i) => (
+                <div
+                  key={img.id || i}
+                  className={styles.gridItem}
+                  onClick={() => setLightbox(i)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && setLightbox(i)}
+                >
+                  <img src={img.src} alt={img.caption} loading="lazy" />
+                  <BorderBeam size={180} duration={14} colorFrom="#E11D48" colorTo="#8B5CF6" borderWidth={1} />
+                  <div className={styles.gridItemOverlay}>
+                    <span className={styles.gridCategoryBadge}>{img.category}</span>
+                    <p className={styles.gridItemCaption}>{img.caption}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

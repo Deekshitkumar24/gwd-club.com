@@ -16,8 +16,8 @@ export default function EventsPage() {
   const [activeYear, setActiveYear] = useState('all');
   const [activeCategory, setActiveCategory] = useState('all');
 
-  const upcomingEvents = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
-  const pastEvents = store.pastEvents?.length ? store.pastEvents : PAST_EVENTS;
+  const upcomingEvents = (store.upcomingEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
+  const pastEvents = (store.pastEvents ?? []).filter((e) => e.status !== 'Draft' && e.status !== 'Archived');
 
   // Derive storyline milestones from CMS store or fall back to default
   const storylineItems: JourneyItem[] = store.timeline?.length

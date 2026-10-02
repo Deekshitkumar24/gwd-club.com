@@ -12,12 +12,14 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const { store } = useCms();
 
-  // Search in store.leaders first, then NINE_LEADERS, then domain members, then TEAM_HIERARCHY
-  const activeLeaders = store.leaders?.length ? store.leaders : NINE_LEADERS;
+  // Search in store.leaders first, then domain members, then TEAM_HIERARCHY
+  const activeLeaders = (store.leaders ?? []).filter((l) => !l.status || l.status === 'Published');
   const leaderMatch = activeLeaders.find((l) => l.id === id);
 
-  const domainMembers = (store.domains || []).flatMap((d) => d.members || []);
-  const allHierarchyMembers = [...TEAM_HIERARCHY.flatMap((l) => l.members), ...domainMembers];
+  const domainMembers = (store.domains ?? [])
+    .filter((d) => d.status !== 'Draft')
+    .flatMap((d) => (d.members || []).filter((m) => m.active !== false));
+  const allHierarchyMembers = [...domainMembers, ...TEAM_HIERARCHY.flatMap((l) => l.members)];
   const hierarchyMatch = allHierarchyMembers.find((m) => m.id === id);
 
   const member = leaderMatch

@@ -9,7 +9,7 @@ import styles from './explore.module.css';
 
 export default function ExplorePage() {
   const { store } = useCms();
-  const domains = store.domains;
+  const domains = (store.domains ?? []).filter((d) => d.status !== 'Draft');
 
   const [activeDomainId, setActiveDomainId] = useState<string>(domains[0]?.id || 'technical');
   const [selectedMember, setSelectedMember] = useState<DomainMember | null>(null);

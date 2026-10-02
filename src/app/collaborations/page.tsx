@@ -23,8 +23,8 @@ export default function CollaborationsPage() {
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [enquiryRef, setEnquiryRef] = useState<string>('');
 
-  const allPartners = store.collaborations?.length ? store.collaborations : COLLABORATIONS;
-  const featured = allPartners.find((c) => c.featured) || allPartners[0];
+  const allPartners = (store.collaborations ?? []).filter((c) => !c.status || c.status === 'Published');
+  const featured = allPartners.find((c) => c.featured) || allPartners[0] || null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -77,38 +77,40 @@ export default function CollaborationsPage() {
       </section>
 
       {/* 02: Featured Collaboration */}
-      <section className={styles.featuredSection} ref={featuredReveal.ref}>
-        <div className={`${styles.featuredInner} reveal ${featuredReveal.isVisible ? 'visible' : ''}`}>
-          <div className={styles.sectionHeader}>
-            <span className="label" style={{ color: 'var(--brand-red)' }}>Spotlight</span>
-            <h2 className={styles.sectionTitle}>Featured Collaboration</h2>
-            <p className={styles.sectionSubtitle}>
-              A representative engagement delivering enterprise platform architecture and long-term utility.
-            </p>
-          </div>
-
-          <div className={styles.featuredCard}>
-            <div className={styles.featuredVisual}>
-              <img
-                src={featured.image}
-                alt={featured.name}
-                className={styles.featuredImg}
-              />
-              <span className={styles.featuredBadge}>FEATURED ALLIANCE</span>
+      {featured && (
+        <section className={styles.featuredSection} ref={featuredReveal.ref}>
+          <div className={`${styles.featuredInner} reveal ${featuredReveal.isVisible ? 'visible' : ''}`}>
+            <div className={styles.sectionHeader}>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>Spotlight</span>
+              <h2 className={styles.sectionTitle}>Featured Collaboration</h2>
+              <p className={styles.sectionSubtitle}>
+                A representative engagement delivering enterprise platform architecture and long-term utility.
+              </p>
             </div>
 
-            <div className={styles.featuredBody}>
-              <span className={styles.featuredCategory}>{featured.type} · {featured.year}</span>
-              <h3 className={styles.featuredName}>{featured.name}</h3>
-              <p className={styles.featuredDesc}>{featured.description}</p>
-              <div className={styles.featuredOutcomeBox}>
-                <div className={styles.featuredOutcomeLabel}>Delivered Outcome</div>
-                <div className={styles.featuredOutcomeText}>✦ {featured.outcome}</div>
+            <div className={styles.featuredCard}>
+              <div className={styles.featuredVisual}>
+                <img
+                  src={featured.image}
+                  alt={featured.name}
+                  className={styles.featuredImg}
+                />
+                <span className={styles.featuredBadge}>FEATURED ALLIANCE</span>
+              </div>
+
+              <div className={styles.featuredBody}>
+                <span className={styles.featuredCategory}>{featured.type} · {featured.year}</span>
+                <h3 className={styles.featuredName}>{featured.name}</h3>
+                <p className={styles.featuredDesc}>{featured.description}</p>
+                <div className={styles.featuredOutcomeBox}>
+                  <div className={styles.featuredOutcomeLabel}>Delivered Outcome</div>
+                  <div className={styles.featuredOutcomeText}>✦ {featured.outcome}</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Atmospheric Chapter Transition ── */}
       <DyeAtmosphereTransition
