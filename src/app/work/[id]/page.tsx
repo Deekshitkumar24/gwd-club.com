@@ -4,19 +4,21 @@ import { use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PROJECTS } from '@/data/content';
+import { useCms } from '@/context/CmsContext';
 import BeforeAfterCard from '@/components/BeforeAfterCard/BeforeAfterCard';
 import styles from './projectDetail.module.css';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const projectIndex = PROJECTS.findIndex((p) => p.id === id);
-  const project = PROJECTS[projectIndex];
+  const { store } = useCms();
+  const allProjects = store.projects?.length ? store.projects : PROJECTS;
+  const projectIndex = allProjects.findIndex((p) => p.id === id);
+  const project = allProjects[projectIndex];
 
   if (!project) return notFound();
 
-  const prevProject = projectIndex > 0 ? PROJECTS[projectIndex - 1] : PROJECTS[PROJECTS.length - 1];
-  const nextProject = projectIndex < PROJECTS.length - 1 ? PROJECTS[projectIndex + 1] : PROJECTS[0];
-  const relatedProjects = PROJECTS.filter((p) => p.id !== project.id).slice(0, 2);
+  const prevProject = projectIndex > 0 ? allProjects[projectIndex - 1] : allProjects[allProjects.length - 1];
+  const nextProject = projectIndex < allProjects.length - 1 ? allProjects[projectIndex + 1] : allProjects[0];
 
   return (
     <div className={styles.page}>

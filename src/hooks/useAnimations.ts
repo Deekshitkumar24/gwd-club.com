@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useSyncExternalStore } from 'react';
 
 /* ── Intersection Observer for scroll reveals ── */
 export function useReveal<T extends HTMLElement = HTMLDivElement>(threshold = 0.15) {
@@ -99,17 +99,24 @@ export function useCountUp(target: number, duration = 2000) {
 
 /* ── Media query hook ── */
 export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      if (typeof window === 'undefined') return () => {};
+      const mq = window.matchMedia(query);
+      mq.addEventListener('change', callback);
+      return () => mq.removeEventListener('change', callback);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    setMatches(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+  const getSnapshot = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
   }, [query]);
 
-  return matches;
+  const getServerSnapshot = useCallback(() => false, []);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /* ── Reduced motion preference ── */

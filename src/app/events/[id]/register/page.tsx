@@ -14,17 +14,17 @@ export default function RegisterPage({ params }: { params: Promise<{ id: string 
   const { id } = use(params);
   const { store, addRegistration } = useCms();
 
+  const [formState, setFormState] = useState<FormState>('idle');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [registrationId, setRegistrationId] = useState<string>('');
+
   const upcomingList = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
   const event = upcomingList.find((e) => e.id === id);
   if (!event) return notFound();
 
   const currentRegistrations = (store.registrations || []).filter(r => r.eventId === event.id);
   const regState = getEventRegistrationState(event, currentRegistrations.length);
-
-  const [formState, setFormState] = useState<FormState>('idle');
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [duplicateError, setDuplicateError] = useState<string | null>(null);
-  const [registrationId, setRegistrationId] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

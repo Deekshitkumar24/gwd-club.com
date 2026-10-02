@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useReveal } from '@/hooks/useAnimations';
 import { useCms } from '@/context/CmsContext';
 import { UPCOMING_EVENTS, PAST_EVENTS } from '@/data/content';
+import { getEventRegistrationState } from '@/lib/cms';
 import Timeline, { JourneyItem, DEFAULT_TOP_JOURNEY, DEFAULT_BOTTOM_JOURNEY } from '@/components/ui/timeline';
 import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './events.module.css';
@@ -67,9 +68,12 @@ export default function EventsPage() {
             </div>
           ) : (
             <div className={styles.upcomingGrid}>
-              {upcomingEvents.map((event) => (
-                <UpcomingEventCard key={event.id} event={event} />
-              ))}
+              {upcomingEvents.map((event) => {
+                const regCount = (store.registrations || []).filter(r => r.eventId === event.id).length;
+                return (
+                  <UpcomingEventCard key={event.id} event={event} registrationCount={regCount} />
+                );
+              })}
             </div>
           )}
         </div>
@@ -150,9 +154,11 @@ export default function EventsPage() {
   );
 }
 
-function UpcomingEventCard({ event }: { event: typeof UPCOMING_EVENTS[0] }) {
+function UpcomingEventCard({ event, registrationCount }: { event: typeof UPCOMING_EVENTS[0]; registrationCount: number }) {
   const { ref, isVisible } = useReveal();
   const isFeatured = event.featured;
+  const regState = getEventRegistrationState(event, registrationCount);
+  const isOpen = regState === 'Registration Open';
 
   return (
     <div ref={ref} className={`${styles.upcomingCard} ${isFeatured ? styles.upcomingCardFeatured : ''} reveal ${isVisible ? 'visible' : ''}`}>
@@ -164,7 +170,18 @@ function UpcomingEventCard({ event }: { event: typeof UPCOMING_EVENTS[0] }) {
       <div className={styles.upcomingCardBody}>
         <div className={styles.upcomingCardMeta}>
           <span className="badge">{event.category}</span>
-          {event.registrationOpen && <span className="badge badge-success">Registration Open</span>}
+          {regState === 'Registration Open' && (
+            <span className="badge badge-success">Registration Open</span>
+          )}
+          {regState === 'Registration Full' && (
+            <span className="badge" style={{ background: 'rgba(234, 88, 12, 0.15)', color: '#F97316', borderColor: 'rgba(234, 88, 12, 0.3)' }}>Registration Full</span>
+          )}
+          {regState === 'Registration Closed' && (
+            <span className="badge" style={{ background: 'rgba(100, 116, 139, 0.15)', color: '#94A3B8', borderColor: 'rgba(100, 116, 139, 0.3)' }}>Registration Closed</span>
+          )}
+          {regState === 'Registration Not Open' && (
+            <span className="badge" style={{ background: 'rgba(100, 116, 139, 0.15)', color: '#94A3B8', borderColor: 'rgba(100, 116, 139, 0.3)' }}>Registration Not Open</span>
+          )}
         </div>
         <h3 className={styles.upcomingCardTitle}>{event.title}</h3>
         <p className={styles.upcomingCardDesc}>{event.shortDescription}</p>
@@ -175,7 +192,7 @@ function UpcomingEventCard({ event }: { event: typeof UPCOMING_EVENTS[0] }) {
         </div>
         <div className={styles.upcomingCardActions}>
           <Link href={`/events/${event.id}`} className="btn btn-primary">View Event</Link>
-          {event.registrationOpen && (
+          {isOpen && (
             <Link href={`/events/${event.id}/register`} className="btn btn-secondary">Register</Link>
           )}
         </div>

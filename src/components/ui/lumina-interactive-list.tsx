@@ -86,7 +86,7 @@ export function Component() {
       let currentSlideIndex = 0;
       let isTransitioning = false;
       let shaderMaterial: any, renderer: any, scene: any, camera: any;
-      let slideTextures: any[] = [];
+      const slideTextures: any[] = [];
       let texturesLoaded = false;
       let sliderEnabled = false;
 

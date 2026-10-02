@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useReveal } from '@/hooks/useAnimations';
 import { useCms } from '@/context/CmsContext';
 import { DyeAtmosphereTransition, DyeCtaBackdrop } from '@/components/DyeVisual';
@@ -99,7 +98,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
 
 export default function WorkflowPage() {
   const { store } = useCms();
-  const headerReveal = useReveal();
+  const { ref: headerRef, isVisible: isHeaderVisible } = useReveal();
   const [activeStep, setActiveStep] = useState(0);
 
   const publishedCmsSteps = (store.workflow || []).filter((w) => w.status === 'Published');
@@ -138,8 +137,8 @@ export default function WorkflowPage() {
     <div className={styles.page}>
       {/* Editorial Header */}
       <section className={styles.header}>
-        <div className={styles.headerInner} ref={headerReveal.ref}>
-          <div className={`reveal ${headerReveal.isVisible ? 'visible' : ''}`}>
+        <div className={styles.headerInner} ref={headerRef}>
+          <div className={`reveal ${isHeaderVisible ? 'visible' : ''}`}>
             <p className="label" style={{ color: 'var(--brand-red)', marginBottom: 'var(--space-md)' }}>
               Execution Framework
             </p>

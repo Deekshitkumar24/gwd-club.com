@@ -53,7 +53,9 @@ export default function HomePage() {
 
   const [heroState, setHeroState] = useState<HeroState>('loading');
   const [videoProgress, setVideoProgress] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const isMutedRef = useRef(false);
+  isMutedRef.current = isMuted;
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [activeDiscipline, setActiveDiscipline] = useState(0);
 
@@ -114,22 +116,15 @@ export default function HomePage() {
     if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
     if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
 
-    // Save that the intro has been played once in this session
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.setItem('gwd_hero_intro_seen', 'true');
-      } catch {
-        /* noop */
-      }
-    }
-
     setHeroState('transitioning');
     unlockScroll();
 
     if (heroVideoRef.current) {
       heroVideoRef.current.pause();
       heroVideoRef.current.loop = false;
+      heroVideoRef.current.muted = true;
     }
+    isMutedRef.current = true;
     setIsMuted(true);
 
     if (typeof window !== 'undefined') {
@@ -147,8 +142,8 @@ export default function HomePage() {
     }, 450);
   }, [unlockScroll]);
 
-  // ── Video handlers ──
-  const handleCanPlay = useCallback(() => {
+  // ── Video start / playback handler ──
+  const startVideo = useCallback(() => {
     if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
 
     const video = heroVideoRef.current;
@@ -159,35 +154,53 @@ export default function HomePage() {
 
     setHeroState('playing');
     lockScroll();
-    video.muted = isMuted;
     video.playsInline = true;
-    video.loop = false; // Intro film plays ONCE from start to finish
+    video.loop = false;
 
-    video
-      .play()
-      .then(() => {
-        const durationMs =
-          video.duration && !isNaN(video.duration) ? video.duration * 1000 + 1000 : 50000;
-        failsafeTimeoutRef.current = setTimeout(() => transitionToRevealed(true), durationMs);
-      })
-      .catch(() => {
-        transitionToRevealed(false);
-      });
-  }, [isMuted, lockScroll, transitionToRevealed]);
+    // Attempt unmuted playback first
+    video.muted = false;
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Unmuted autoplay permitted
+          setIsMuted(false);
+          isMutedRef.current = false;
+          const durationMs =
+            video.duration && !isNaN(video.duration) ? video.duration * 1000 + 1000 : 50000;
+          if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
+          failsafeTimeoutRef.current = setTimeout(() => transitionToRevealed(true), durationMs);
+        })
+        .catch(() => {
+          // If browser restricts unmuted autoplay, smoothly continue playing muted so video is immediately visible
+          video.muted = true;
+          setIsMuted(true);
+          isMutedRef.current = true;
+          video.play().catch(() => {});
+          const durationMs =
+            video.duration && !isNaN(video.duration) ? video.duration * 1000 + 1000 : 50000;
+          if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
+          failsafeTimeoutRef.current = setTimeout(() => transitionToRevealed(true), durationMs);
+        });
+    }
+  }, [lockScroll, transitionToRevealed]);
 
   // ── Initial hero check on mount ──
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem('gwd_hero_intro_seen');
+      } catch {
+        /* noop */
+      }
+    }
+
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData =
-      typeof navigator !== 'undefined' &&
-      (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    const alreadySeen =
-      typeof window !== 'undefined' && sessionStorage.getItem('gwd_hero_intro_seen') === 'true';
 
-    // If user already watched intro in this session, or prefers reduced motion, skip straight to content!
-    if (alreadySeen || prefersReducedMotion || saveData) {
+    if (prefersReducedMotion) {
       setHeroState('revealed');
       unlockScroll();
       if (typeof window !== 'undefined') {
@@ -196,30 +209,25 @@ export default function HomePage() {
       return;
     }
 
-    setHeroState('loading');
+    // Set playing state immediately so video is not blocked by loading screen
+    setHeroState('playing');
 
-    // Attempt immediate playback if video is already ready in cache
     const video = heroVideoRef.current;
     if (video) {
-      video.muted = true;
-      video.playsInline = true;
-      video.loop = false;
-      if (video.readyState >= 2) {
-        handleCanPlay();
-      }
+      startVideo();
     }
 
-    // 8s fallback load timeout
+    // Fallback failsafe timeout
     loadTimeoutRef.current = setTimeout(() => {
       transitionToRevealed(false);
-    }, 8000);
+    }, 15000);
 
     return () => {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
       if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
       unlockScroll();
     };
-  }, [handleCanPlay, transitionToRevealed, unlockScroll]);
+  }, [startVideo, transitionToRevealed, unlockScroll]);
 
   const handleTimeUpdate = () => {
     const video = heroVideoRef.current;
@@ -246,6 +254,7 @@ export default function HomePage() {
     if (heroVideoRef.current) {
       const nextMuted = !heroVideoRef.current.muted;
       heroVideoRef.current.muted = nextMuted;
+      isMutedRef.current = nextMuted;
       setIsMuted(nextMuted);
     }
   };
@@ -346,8 +355,8 @@ export default function HomePage() {
             autoPlay
             playsInline
             preload="auto"
-            onCanPlay={handleCanPlay}
-            onLoadedData={handleCanPlay}
+            onCanPlay={startVideo}
+            onLoadedData={startVideo}
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleVideoEnded}
             onError={handleVideoError}

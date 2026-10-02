@@ -65,6 +65,8 @@ type AdminTab =
   | 'settings'
   | 'auditLog';
 
+const generateRecordId = (prefix: string) => `${prefix}-${Date.now().toString(36)}`;
+
 export default function AdminPortal() {
   const {
     store,
@@ -658,7 +660,7 @@ export default function AdminPortal() {
       return;
     }
 
-    const id = storylineForm.id || `${storylineForm.year.toLowerCase()}-${storylineForm.month.toLowerCase()}-${Date.now().toString(36)}`;
+    const id = storylineForm.id || generateRecordId(`${storylineForm.year.toLowerCase()}-${storylineForm.month.toLowerCase()}`);
     const newItem: JourneyItem = {
       id,
       year: storylineForm.year,
@@ -770,7 +772,7 @@ export default function AdminPortal() {
       showToast('Gallery image updated');
     } else {
       createGalleryItem({
-        id: `gallery-${Date.now().toString(36)}`,
+        id: generateRecordId('gallery'),
         src: galleryForm.src,
         caption: galleryForm.caption,
         category: galleryForm.category,
@@ -841,7 +843,7 @@ export default function AdminPortal() {
       .filter(Boolean);
 
     const stepPayload: WorkflowStepItem = {
-      id: workflowForm.id || `wf-${workflowForm.stepNumber}-${Date.now().toString(36)}`,
+      id: workflowForm.id || generateRecordId(`wf-${workflowForm.stepNumber}`),
       stepNumber: workflowForm.stepNumber,
       phase: workflowForm.phase,
       title: workflowForm.title.trim(),
@@ -918,7 +920,7 @@ export default function AdminPortal() {
             </button>
 
             <p className={styles.authHint}>
-              Default system pass: <code>gwd2026</code>
+              Authorized credentials issued by GWD Executive Leadership.
             </p>
           </form>
 

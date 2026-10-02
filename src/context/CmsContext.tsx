@@ -99,8 +99,10 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   // Initialize from storage on mount
   useEffect(() => {
     const loaded = getCmsStore();
-    setStore(loaded);
-    setIsLoaded(true);
+    queueMicrotask(() => {
+      setStore(loaded);
+      setIsLoaded(true);
+    });
 
     const handleUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<GwdCmsStore>;

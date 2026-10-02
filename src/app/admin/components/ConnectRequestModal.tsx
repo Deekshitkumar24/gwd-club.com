@@ -474,7 +474,7 @@ export default function ConnectRequestModal({
               <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
                 <span className={styles.subtext}>Additional Message / Special Constraints</span>
                 <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginTop: '0.25rem', fontStyle: 'italic' }}>
-                  "{liveRequest.additionalMessage}"
+                  &ldquo;{liveRequest.additionalMessage}&rdquo;
                 </p>
               </div>
             )}

@@ -11,6 +11,7 @@ import styles from './eventDetail.module.css';
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { store } = useCms();
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const allEvents = [...(store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS), ...(store.pastEvents?.length ? store.pastEvents : PAST_EVENTS)];
   const event = allEvents.find((e) => e.id === id);
@@ -25,7 +26,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const eventRegistrations = (store.registrations || []).filter(r => r.eventId === id);
   const regState = getEventRegistrationState(event, eventRegistrations.length);
   const isRegistrationAvailable = Boolean(isUpcoming && regState === 'Registration Open');
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <div className={styles.page}>

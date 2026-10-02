@@ -4,15 +4,20 @@ import { use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { NINE_LEADERS, TEAM_HIERARCHY, PROJECTS } from '@/data/content';
+import { useCms } from '@/context/CmsContext';
 import GwdPlaceholder from '@/components/GwdPlaceholder/GwdPlaceholder';
 import styles from './memberDetail.module.css';
 
 export default function TeamMemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { store } = useCms();
 
-  // Search in NINE_LEADERS first, then fallback to TEAM_HIERARCHY
-  const leaderMatch = NINE_LEADERS.find((l) => l.id === id);
-  const allHierarchyMembers = TEAM_HIERARCHY.flatMap((l) => l.members);
+  // Search in store.leaders first, then NINE_LEADERS, then domain members, then TEAM_HIERARCHY
+  const activeLeaders = store.leaders?.length ? store.leaders : NINE_LEADERS;
+  const leaderMatch = activeLeaders.find((l) => l.id === id);
+
+  const domainMembers = (store.domains || []).flatMap((d) => d.members || []);
+  const allHierarchyMembers = [...TEAM_HIERARCHY.flatMap((l) => l.members), ...domainMembers];
   const hierarchyMatch = allHierarchyMembers.find((m) => m.id === id);
 
   const member = leaderMatch
@@ -30,24 +35,29 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
         tier: leaderMatch.tier,
       }
     : hierarchyMatch
-    ? {
-        id: hierarchyMatch.id,
-        name: hierarchyMatch.name,
-        role: hierarchyMatch.role,
-        bio: hierarchyMatch.bio,
-        quote: hierarchyMatch.quote,
-        skills: hierarchyMatch.skills || [],
-        image: hierarchyMatch.image,
-        hasPhoto: hierarchyMatch.hasPhoto ?? !!hierarchyMatch.image,
-        socials: hierarchyMatch.socials || {},
-        projects: hierarchyMatch.projects || [],
-        tier: 'council',
-      }
+    ? (() => {
+        const h = hierarchyMatch as { photo?: string; image?: string; hasPhoto?: boolean; quote?: string; skills?: string[]; socials?: Record<string, string>; projects?: string[] };
+        const memberImg = h.photo || h.image;
+        return {
+          id: hierarchyMatch.id,
+          name: hierarchyMatch.name,
+          role: hierarchyMatch.role,
+          bio: hierarchyMatch.bio || '',
+          quote: h.quote,
+          skills: h.skills || [],
+          image: memberImg,
+          hasPhoto: h.hasPhoto ?? !!memberImg,
+          socials: h.socials || {},
+          projects: h.projects || [],
+          tier: 'council',
+        };
+      })()
     : null;
 
   if (!member) return notFound();
 
-  const relatedProjects = PROJECTS.filter((p) => member.projects?.includes(p.id));
+  const allProjects = store.projects?.length ? store.projects : PROJECTS;
+  const relatedProjects = allProjects.filter((p) => member.projects?.includes(p.id));
 
   return (
     <div className={styles.page}>
