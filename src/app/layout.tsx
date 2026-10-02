@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation/Navigation";
 import Footer from "@/components/Footer/Footer";
 import { SharedDyeProvider } from "@/components/DyeVisual";
 import { CmsProvider } from "@/context/CmsContext";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "GWD — Get Work Done | Student Technology & Creative Collective",
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
           </SharedDyeProvider>
         </CmsProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
