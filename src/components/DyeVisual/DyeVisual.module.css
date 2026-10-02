@@ -1,0 +1,333 @@
+/* ============================================================
+   DYE VISUAL DESIGN SYSTEM — STYLES
+   Editorial · Atmospheric · Seamless Transitions · Controlled Motion
+   ============================================================ */
+
+/* ── Atmospheric Chapter Transition ── */
+.atmosphereTransition {
+  position: relative;
+  width: 100%;
+  height: clamp(180px, 22vw, 280px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg, #FFFFFF);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  pointer-events: auto;
+}
+
+.atmosphereDark {
+  background-color: var(--color-bg-dark, #121212);
+}
+
+.atmosphereCanvasWrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.85;
+}
+
+.atmosphereContent {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-width, 1400px);
+  padding: 0 var(--gutter, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.atmosphereLabelCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.atmosphereChapterTag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-red, #C41E1E);
+  font-weight: 600;
+}
+
+.atmosphereHeadline {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary, #121212);
+  margin: 0;
+}
+
+.atmosphereHeadlineDark {
+  color: #FFFFFF;
+}
+
+.atmosphereHint {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted, #AAAAAA);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.atmospherePulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--brand-red, #C41E1E);
+  animation: pulseDot 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* ── Contained Interactive Card ── */
+.containedCard {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  border: 1px solid var(--color-border, #E8E8E8);
+  background: var(--color-bg, #FFFFFF);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.containedCard:hover {
+  border-color: rgba(196, 30, 30, 0.4);
+  box-shadow: 0 12px 36px rgba(196, 30, 30, 0.08);
+}
+
+.containedCardDark {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--color-bg-dark, #121212);
+}
+
+.containedCardDark:hover {
+  border-color: rgba(196, 30, 30, 0.5);
+  box-shadow: 0 12px 40px rgba(196, 30, 30, 0.15);
+}
+
+.containedCanvasBox {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+}
+
+.containedOverlayTop {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.containedBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(18, 18, 18, 0.85);
+  color: #FFFFFF;
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.containedInteractiveNote {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+}
+
+.containedBody {
+  padding: 1.5rem;
+  background: var(--color-bg, #FFFFFF);
+  border-top: 1px solid var(--color-border-subtle, #F0F0F0);
+}
+
+.containedBodyDark {
+  background: var(--color-bg-dark-secondary, #1A1A1A);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.containedTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary, #121212);
+  margin-bottom: 0.5rem;
+}
+
+.containedTitleDark {
+  color: #FFFFFF;
+}
+
+.containedDesc {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary, #4A4A4A);
+  margin: 0;
+}
+
+.containedDescDark {
+  color: var(--color-text-on-dark-secondary, rgba(255, 255, 255, 0.7));
+}
+
+/* ── Full-Bleed Ambient Hero/CTA Stage ── */
+.ambientCtaStage {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  padding: clamp(4rem, 10vw, 7rem) 0;
+  overflow: hidden;
+  background-color: var(--brand-black, #121212);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ambientCtaCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.75;
+}
+
+.ambientCtaScrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(18, 18, 18, 0.3) 0%, rgba(18, 18, 18, 0.85) 80%, #121212 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ambientCtaContainer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--gutter, 2rem);
+  text-align: center;
+}
+
+.ambientCtaTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brand-red, #C41E1E);
+  margin-bottom: 1.25rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(196, 30, 30, 0.12);
+  border: 1px solid rgba(196, 30, 30, 0.25);
+}
+
+.ambientCtaTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #FFFFFF;
+  margin: 0 0 1.5rem 0;
+}
+
+.ambientCtaAccent {
+  color: var(--brand-red, #C41E1E);
+}
+
+.ambientCtaSubtitle {
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 680px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.ambientCtaActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.btnPrimaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2.25rem;
+  background-color: var(--brand-red, #C41E1E);
+  color: #FFFFFF;
+  font-family: var(--font-body, sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btnPrimaryCta:hover {
+  background-color: var(--brand-red-hover, #A81818);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(196, 30, 30, 0.4);
+}
+
+.btnSecondaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2.25rem;
+  background-color: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-family: var(--font-body, sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.btnSecondaryCta:hover {
+  border-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}

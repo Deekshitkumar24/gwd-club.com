@@ -1,45 +1,462 @@
-.page { padding-top: 120px; }
-
-.header { padding: var(--space-4xl) 0 var(--space-3xl); }
-.headerInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
-.headerTitle { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin-bottom: var(--space-lg); }
-.headerDesc { font-size: var(--text-lg); color: var(--color-text-secondary); max-width: 600px; line-height: 1.7; }
-
-.teamSection { padding: var(--space-2xl) 0 var(--space-5xl); }
-.teamInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); display: flex; flex-direction: column; gap: var(--space-4xl); }
-
-.level {}
-.levelHeader { display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--space-lg); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-xl); }
-.levelLabel { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; }
-.levelCount { font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-xl); }
-.gridLeadership { grid-template-columns: repeat(2, 1fr); max-width: 800px; }
-
-.card { display: flex; flex-direction: column; gap: var(--space-md); transition: transform var(--duration-fast) var(--ease-out); }
-.card:hover { transform: translateY(-4px); }
-
-.cardLeadership { gap: var(--space-lg); }
-
-.cardImage { position: relative; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 3/4; }
-.cardImage img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-slow) var(--ease-out); }
-.card:hover .cardImage img { transform: scale(1.05); }
-.cardImageOverlay { position: absolute; bottom: 0; left: 0; right: 0; height: 40%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); opacity: 0; transition: opacity var(--duration-fast); }
-.card:hover .cardImageOverlay { opacity: 1; }
-
-.cardBody { display: flex; flex-direction: column; gap: 0.25rem; }
-.cardName { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; transition: color var(--duration-fast); }
-.card:hover .cardName { color: var(--color-accent); }
-.cardRole { font-size: var(--text-sm); color: var(--color-text-tertiary); }
-.cardBio { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-top: var(--space-sm); }
-.cardSkills { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-sm); }
-.cardSkill { font-size: 0.6875rem; padding: 0.2rem 0.5rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-full); color: var(--color-text-tertiary); }
-
-@media (max-width: 768px) {
-  .gridLeadership { grid-template-columns: 1fr; max-width: 100%; }
-  .grid { grid-template-columns: repeat(2, 1fr); }
+.page {
+  padding-top: 100px;
 }
 
-@media (max-width: 480px) {
-  .grid { grid-template-columns: 1fr; }
+.header {
+  padding: var(--space-4xl) 0 var(--space-3xl);
+}
+
+.headerInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.headerTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: var(--space-lg);
+  color: var(--color-text-primary);
+}
+
+.headerDesc {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  max-width: 720px;
+  line-height: 1.7;
+}
+
+.sectionHeader {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.sectionSubtitle {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+/* Founders Section */
+.foundersSection {
+  padding: var(--space-4xl) 0 var(--space-5xl);
+  background: rgba(250, 250, 252, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.foundersInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.foundersGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2xl);
+}
+
+.founderCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--duration-fast), border-color var(--duration-fast);
+}
+
+.founderCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand-red);
+}
+
+.founderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-md);
+}
+
+.founderIndex {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--brand-red);
+  font-weight: 700;
+}
+
+.founderRole {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.founderName {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+}
+
+.founderBio {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+
+.founderTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: auto;
+}
+
+.founderTag {
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Executive Leadership Section */
+.teamSection {
+  padding: var(--space-5xl) 0;
+}
+
+.teamInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Slot 01: President Hero Card */
+.presidentHero {
+  margin-bottom: var(--space-4xl);
+}
+
+.presidentCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: var(--space-3xl);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--brand-red);
+}
+
+.presidentMedia {
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: #000;
+}
+
+.presidentImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.presidentDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slotBadge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--brand-red);
+  background: var(--brand-red-subtle);
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+  margin-bottom: var(--space-xs);
+}
+
+.presidentNameText {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.presidentRoleText {
+  font-size: var(--text-lg);
+  color: var(--brand-red);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+
+.presidentBioText {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.presidentQuoteText {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-style: italic;
+  color: var(--color-text-muted);
+  border-left: 2px solid var(--brand-red);
+  padding-left: var(--space-md);
+  margin: var(--space-md) 0;
+}
+
+.presidentSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--space-sm);
+}
+
+.skillTag {
+  font-size: var(--text-xs);
+  padding: 0.25rem 0.625rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+}
+
+.presidentActions {
+  margin-top: var(--space-lg);
+}
+
+/* Slots 02–09: Council Grid */
+.councilGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xl);
+}
+
+.leaderCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--duration-fast), border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.leaderCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--brand-red);
+  box-shadow: var(--shadow-md);
+}
+
+.leaderMedia {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.leaderImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.leaderCard:hover .leaderImg {
+  transform: scale(1.04);
+}
+
+.slotTag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.leaderBody {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.leaderName {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.leaderRole {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--brand-red);
+  margin-bottom: var(--space-sm);
+}
+
+.leaderBio {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.profileLink {
+  margin-top: auto;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color var(--duration-fast);
+}
+
+.leaderCard:hover .profileLink {
+  color: var(--brand-red);
+}
+
+/* Core Directory */
+.coreSection {
+  padding: var(--space-5xl) 0;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.coreInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.coreGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.coreBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.coreIndex {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--brand-red);
+  font-weight: 700;
+}
+
+.coreName {
+  color: var(--color-text-primary);
+}
+
+/* Team CTA */
+.teamCtaSection {
+  padding: var(--space-5xl) 0;
+  text-align: center;
+}
+
+.teamCtaInner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.teamCtaTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-sm);
+}
+
+.teamCtaDesc {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-2xl);
+}
+
+.teamCtaActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+  .councilGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .foundersGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .presidentCard {
+    grid-template-columns: 1fr;
+  }
+  .councilGrid {
+    grid-template-columns: 1fr;
+  }
 }

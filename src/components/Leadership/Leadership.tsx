@@ -1,87 +1,11 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useAnimations';
+import { NINE_LEADERS, LeaderSlot } from '@/data/content';
+import GwdPlaceholder from '@/components/GwdPlaceholder/GwdPlaceholder';
 import styles from './Leadership.module.css';
-
-/* ── Leadership Data ── */
-export interface LeadershipMember {
-  id: string;
-  name: string;
-  role: string;
-  description: string;
-  quote?: string;
-  image?: string; // undefined = placeholder
-  socials?: { label: string; url: string }[];
-}
-
-export const LEADERSHIP: LeadershipMember[] = [
-  {
-    id: 'president',
-    name: 'Aldrin Paul',
-    role: 'President',
-    description: 'Leading GWD\'s mission to turn students into builders who ship real work.',
-    quote: 'The best way to learn is to build something that matters.',
-    image: '/team/president.jpg',
-  },
-  {
-    id: 'vice-president',
-    name: 'Vice President',
-    role: 'Vice President',
-    description: 'Driving strategy and operations to keep GWD executing at scale.',
-    // No image yet
-  },
-  {
-    id: 'general-secretary',
-    name: 'General Secretary',
-    role: 'General Secretary',
-    description: 'Coordinating across departments to ensure every initiative runs smoothly.',
-    image: '/team/general-secretary.jpg',
-  },
-  {
-    id: 'technical-lead',
-    name: 'Technical Lead',
-    role: 'Technical Lead',
-    description: 'Architecting the technology behind GWD\'s projects and platforms.',
-    image: '/team/technical-lead.png',
-  },
-  {
-    id: 'creative-lead',
-    name: 'Creative Lead',
-    role: 'Creative Lead',
-    description: 'Shaping GWD\'s visual identity and creative output across all touchpoints.',
-    // No image yet
-  },
-  {
-    id: 'marketing-lead',
-    name: 'Marketing Lead',
-    role: 'Marketing Lead',
-    description: 'Building GWD\'s presence and telling our story to the world.',
-    // No image yet
-  },
-  {
-    id: 'event-management-lead',
-    name: 'Event Management Lead',
-    role: 'Event Management Lead',
-    description: 'Planning and executing events that bring people together and create impact.',
-    image: '/team/event-management-lead.jpg',
-  },
-  {
-    id: 'pr-lead',
-    name: 'PR Lead',
-    role: 'PR Lead',
-    description: 'Managing external communications and building relationships with partners.',
-    // No image yet
-  },
-  {
-    id: 'visual-media-lead',
-    name: 'Visual Media Lead',
-    role: 'Visual Media Lead',
-    description: 'Capturing and producing visual content that documents GWD\'s journey.',
-    // No image yet
-  },
-];
 
 /* ── 3D Tilt Hook ── */
 function useTilt(intensity: number = 8) {
@@ -103,14 +27,17 @@ function useTilt(intensity: number = 8) {
   return { ref, tilt, handleMove, handleLeave };
 }
 
-/* ── President Feature ── */
-function PresidentFeature({ member }: { member: LeadershipMember }) {
+/* ── President Feature (Slot 1) ── */
+function PresidentFeature({ member }: { member: LeaderSlot }) {
   const reveal = useReveal(0.15);
   const { ref: tiltRef, tilt, handleMove, handleLeave } = useTilt(4);
 
   return (
-    <div className={styles.presidentSection} ref={reveal.ref}>
-      <div className={`${styles.presidentInner} ${reveal.isVisible ? 'visible' : ''}`}>
+    <div
+      ref={reveal.ref}
+      className={`${styles.presidentWrap} reveal ${reveal.isVisible ? 'visible' : ''}`}
+    >
+      <div className={styles.presidentCard}>
         <div
           className={styles.presidentPortrait}
           ref={tiltRef}
@@ -120,55 +47,63 @@ function PresidentFeature({ member }: { member: LeadershipMember }) {
             transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           }}
         >
-          {member.image ? (
-            <img src={member.image} alt={member.name} />
+          {member.photo ? (
+            <img
+              src={member.photo}
+              alt={member.name}
+              className={styles.presidentImage}
+              loading="eager"
+            />
           ) : (
-            <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                </svg>
-              </span>
-            </div>
+            <GwdPlaceholder name={member.name} role={member.role} />
           )}
           <div className={styles.presidentPortraitAccent} />
         </div>
 
         <div className={styles.presidentInfo}>
-          <span className="label-red">Club Lead</span>
+          <span className="label-red">Club President · Slot 01</span>
           <h3 className={styles.presidentName}>{member.name}</h3>
           <p className={styles.presidentRole}>{member.role}</p>
           <div className={styles.dividerRed} />
-          <p className={styles.presidentDesc}>{member.description}</p>
+          <p className={styles.presidentDesc}>{member.bio}</p>
           {member.quote && (
             <blockquote className={styles.presidentQuote}>
               &ldquo;{member.quote}&rdquo;
             </blockquote>
           )}
-          <Link href="/team" className={`btn btn-secondary ${styles.teamCta}`}>
-            Meet the Full Team →
-          </Link>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
+            <Link href={`/team/${member.id}`} className="btn btn-primary">
+              View Profile →
+            </Link>
+            <Link href="/team" className={`btn btn-secondary ${styles.teamCta}`}>
+              Meet All 9 Leaders →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Leadership Card ── */
-function LeadershipCard({ member, index, tier }: {
-  member: LeadershipMember;
+/* ── Leadership Card (Slots 2–9) ── */
+function LeadershipCard({
+  member,
+  index,
+  tier,
+}: {
+  member: LeaderSlot;
   index: number;
   tier: 'senior' | 'lead';
 }) {
-  const { ref, isVisible } = useReveal(0.15);
+  const { ref, isVisible } = useReveal<HTMLAnchorElement>(0.15);
   const { ref: tiltRef, tilt, handleMove, handleLeave } = useTilt(6);
 
   return (
-    <div
+    <Link
+      href={`/team/${member.id}`}
       ref={ref}
       className={`${styles.card} ${styles[`card${tier}`]} reveal ${isVisible ? 'visible' : ''}`}
-      style={{ transitionDelay: `${index * 80}ms` }}
+      style={{ transitionDelay: `${index * 80}ms`, textDecoration: 'none' }}
     >
       <div
         className={styles.cardImageWrap}
@@ -179,94 +114,90 @@ function LeadershipCard({ member, index, tier }: {
           transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         }}
       >
-        {member.image ? (
-          <img src={member.image} alt={member.name} className={styles.cardImage} loading="lazy" />
+        {member.photo ? (
+          <img src={member.photo} alt={member.name} className={styles.cardImage} loading="lazy" />
         ) : (
-          <div className={styles.cardPlaceholder}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-            </svg>
-            <span className={styles.cardPlaceholderText}>Photo coming soon</span>
-          </div>
+          <GwdPlaceholder name={member.name} role={member.role} />
         )}
         <div className={styles.cardHoverOverlay}>
           <span className={styles.cardHoverText}>View Profile →</span>
         </div>
       </div>
       <div className={styles.cardInfo}>
-        <h4 className={styles.cardName}>{member.name}</h4>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.25rem' }}>
+          <h4 className={styles.cardName}>{member.name}</h4>
+          <span style={{ fontSize: '0.7rem', color: 'var(--brand-red)', fontWeight: 700 }}>
+            0{member.slot}
+          </span>
+        </div>
         <p className={styles.cardRole}>{member.role}</p>
-        <p className={styles.cardDesc}>{member.description}</p>
+        <p className={styles.cardDesc}>{member.bio}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
-/* ── Main Component ── */
+/* ── Main Leadership Component ── */
 export default function Leadership() {
-  const headerReveal = useReveal(0.2);
-  const hierarchyReveal = useReveal(0.15);
+  const headerReveal = useReveal(0.15);
 
-  const president = LEADERSHIP[0];
-  const seniorLeadership = LEADERSHIP.slice(1, 3); // VP, Gen Sec
-  const functionalLeads = LEADERSHIP.slice(3); // Tech, Creative, Marketing, Event, PR, Visual
+  const president = NINE_LEADERS[0];
+  const seniorTier = NINE_LEADERS.slice(1, 4); // Vice President, General Secretary, Technical Lead
+  const leadTier = NINE_LEADERS.slice(4); // Creative, Marketing, Event Management, PR, Visual Media
 
   return (
-    <section className={styles.section} id="team">
-      {/* Section Header */}
-      <div className={styles.sectionHeader} ref={headerReveal.ref}>
-        <div className={`reveal ${headerReveal.isVisible ? 'visible' : ''}`}>
-          <span className="label-red">Leadership</span>
-          <h2 className={styles.sectionTitle}>The People Behind the Work</h2>
-          <p className={styles.sectionDesc}>
-            GWD is driven by students who turn ideas into real projects, events, experiences, and shipped work.
+    <section className={styles.section} id="leadership">
+      <div className={styles.container}>
+        {/* Section Header */}
+        <div
+          ref={headerReveal.ref}
+          className={`${styles.header} reveal ${headerReveal.isVisible ? 'visible' : ''}`}
+        >
+          <span className="label-red">Club Leadership Hierarchy</span>
+          <h2 className={styles.title}>The 9-Role Leadership Structure</h2>
+          <p className={styles.subtitle}>
+            Organized into dedicated lanes of operational responsibility — driving technology, design, events, and media across the collective.
           </p>
         </div>
-      </div>
 
-      {/* President Feature */}
-      <PresidentFeature member={president} />
+        {/* Tier 1: President Feature */}
+        <PresidentFeature member={president} />
 
-      {/* Hierarchy Line */}
-      <div className={styles.hierarchyLine} ref={hierarchyReveal.ref}>
-        <div className={`${styles.hierarchyLineInner} ${hierarchyReveal.isVisible ? styles.hierarchyLineVisible : ''}`} />
-      </div>
-
-      {/* Senior Leadership: VP + Gen Sec */}
-      <div className={styles.tierSection}>
-        <div className={styles.tierHeader}>
-          <span className={styles.tierLabel}>Senior Leadership</span>
+        {/* Tier 2: Senior Leadership (Slots 2–4) */}
+        <div className={styles.tierSection}>
+          <div className={styles.tierHeader}>
+            <span className={styles.tierBadge}>TIER 01 · EXECUTIVE LEADERSHIP</span>
+            <span className={styles.tierLine} />
+          </div>
+          <div className={styles.tierGridThree}>
+            {seniorTier.map((member, i) => (
+              <LeadershipCard key={member.id} member={member} index={i} tier="senior" />
+            ))}
+          </div>
         </div>
-        <div className={styles.seniorGrid}>
-          {seniorLeadership.map((member, i) => (
-            <LeadershipCard key={member.id} member={member} index={i} tier="senior" />
-          ))}
-        </div>
-      </div>
 
-      {/* Hierarchy Line */}
-      <div className={styles.hierarchyLine}>
-        <div className={`${styles.hierarchyLineInner} ${hierarchyReveal.isVisible ? styles.hierarchyLineVisible : ''}`} />
-      </div>
-
-      {/* Functional Leads */}
-      <div className={styles.tierSection}>
-        <div className={styles.tierHeader}>
-          <span className={styles.tierLabel}>Department Leads</span>
+        {/* Tier 3: Specialized Division Leads (Slots 5–9) */}
+        <div className={styles.tierSection}>
+          <div className={styles.tierHeader}>
+            <span className={styles.tierBadge}>TIER 02 · DIVISIONAL LEADS</span>
+            <span className={styles.tierLine} />
+          </div>
+          <div className={styles.tierGridFive}>
+            {leadTier.map((member, i) => (
+              <LeadershipCard key={member.id} member={member} index={i} tier="lead" />
+            ))}
+          </div>
         </div>
-        <div className={styles.leadsGrid}>
-          {functionalLeads.map((member, i) => (
-            <LeadershipCard key={member.id} member={member} index={i} tier="lead" />
-          ))}
-        </div>
-      </div>
 
-      {/* Bottom CTA */}
-      <div className={styles.bottomCta}>
-        <Link href="/team" className="btn btn-primary btn-lg">
-          Meet the Full Team
-        </Link>
+        {/* Bottom CTA */}
+        <div className={styles.bottomCta}>
+          <p className={styles.ctaText}>
+            Want to build alongside GWD leadership on real-world systems?
+          </p>
+          <Link href="/join" className="btn btn-primary">
+            Apply to Join GWD →
+          </Link>
+        </div>
       </div>
     </section>
   );

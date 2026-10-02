@@ -1,0 +1,191 @@
+.page {
+  padding-top: 100px;
+}
+
+.header {
+  padding: var(--space-4xl) 0 var(--space-3xl);
+}
+
+.headerInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.headerTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: var(--space-lg);
+  color: var(--color-text-primary);
+}
+
+.headerDesc {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  max-width: 680px;
+  line-height: 1.7;
+}
+
+.contentSection {
+  padding: var(--space-3xl) 0 var(--space-5xl);
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.contentInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: var(--space-3xl);
+  align-items: start;
+}
+
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.infoCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cardBadge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand-red);
+  margin-bottom: var(--space-xs);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.cardText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.channelList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.channelItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-xs);
+}
+
+.channelKey {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.channelVal {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  font-family: var(--font-mono);
+}
+
+/* Form Card */
+.formCol {}
+
+.formCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-md);
+}
+
+.formTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.formSubtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2xl);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.successBlock {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+}
+
+.successIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-red);
+  color: #fff;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+}
+
+.refBadge {
+  margin-top: var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--brand-red);
+  background: var(--brand-red-subtle);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  display: inline-block;
+}
+
+@media (max-width: 900px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,53 +1,78 @@
 'use client';
 
 import { useState } from 'react';
-import { useReveal } from '@/hooks/useAnimations';
+import { useCms } from '@/context/CmsContext';
 import { GALLERY_IMAGES } from '@/data/content';
-import ImageFanCarousel from '@/components/ImageFanCarousel/ImageFanCarousel';
+import { Component as LuminaInteractiveList } from '@/components/ui/lumina-interactive-list';
+import { SmoothScrollHero } from '@/components/ui/modern-hero';
+import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './gallery.module.css';
 
 export default function GalleryPage() {
-  const headerReveal = useReveal();
+  const { store } = useCms();
+  const galleryImages = store.gallery && store.gallery.length > 0 ? store.gallery : GALLERY_IMAGES;
   const [activeCategory, setActiveCategory] = useState('all');
   const [lightbox, setLightbox] = useState<number | null>(null);
 
-  const categories = ['all', ...new Set(GALLERY_IMAGES.map(i => i.category))];
-  const filtered = activeCategory === 'all' ? GALLERY_IMAGES : GALLERY_IMAGES.filter(i => i.category === activeCategory);
+  const categories = ['all', ...new Set(galleryImages.map((i) => i.category))];
+  const filtered =
+    activeCategory === 'all'
+      ? galleryImages
+      : galleryImages.filter((i) => i.category === activeCategory);
 
   return (
-    <div className={styles.page}>
-      <section className={styles.header}>
-        <div className={styles.headerInner} ref={headerReveal.ref}>
-          <div className={`reveal ${headerReveal.isVisible ? 'visible' : ''}`}>
-            <p className="label" style={{ color: 'var(--color-accent)', marginBottom: 'var(--space-md)' }}>Gallery</p>
-            <h1 className={styles.headerTitle}>Moments worth remembering.</h1>
-          </div>
-        </div>
+    <div className={styles.page} data-dye-section="gallery">
+      {/* ── Upper Section: Lumina Interactive WebGL Glass Shader Slider ── */}
+      <section className={styles.luminaHeroSection}>
+        <LuminaInteractiveList />
       </section>
 
-      {/* 3D Fan Carousel */}
-      <section className={styles.carouselSection}>
-        <div className={styles.carouselInner}>
-          <ImageFanCarousel images={GALLERY_IMAGES.slice(0, 8).map(img => ({ src: img.src, caption: img.caption }))} />
-        </div>
+      {/* ── Lower Section: Pure Spatial Image Parallax & Expanding Center Builder Shot ── */}
+      <section className={styles.modernHeroWrapper} data-dye-section="gallery">
+        <SmoothScrollHero />
       </section>
 
-      {/* Grid Gallery */}
+      {/* ── Lower Section 2: Complete Photographic Evidence & Archive Grid ── */}
       <section className={styles.gridSection}>
         <div className={styles.gridInner}>
-          <div className={styles.filters}>
-            {categories.map(cat => (
-              <button key={cat} className={`${styles.filterBtn} ${activeCategory === cat ? styles.filterBtnActive : ''}`} onClick={() => setActiveCategory(cat)}>
-                {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </button>
-            ))}
+          <div className={styles.archiveHeaderRow}>
+            <div>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>
+                06.3 · Complete Photographic Records
+              </span>
+              <h2 className={styles.archiveTitle}>Moments worth remembering.</h2>
+              <p className={styles.archiveSub}>
+                Verified photographic record of builder sprints, grassroots sports tournaments, and campus builds.
+              </p>
+            </div>
+
+            <div className={styles.filters}>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`${styles.filterBtn} ${activeCategory === cat ? styles.filterBtnActive : ''}`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat === 'all' ? 'All Records' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className={styles.grid}>
             {filtered.map((img, i) => (
-              <div key={i} className={styles.gridItem} onClick={() => setLightbox(i)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setLightbox(i)}>
+              <div
+                key={img.id || i}
+                className={styles.gridItem}
+                onClick={() => setLightbox(i)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setLightbox(i)}
+              >
                 <img src={img.src} alt={img.caption} loading="lazy" />
+                <BorderBeam size={180} duration={14} colorFrom="#E11D48" colorTo="#8B5CF6" borderWidth={1} />
                 <div className={styles.gridItemOverlay}>
+                  <span className={styles.gridCategoryBadge}>{img.category}</span>
                   <p className={styles.gridItemCaption}>{img.caption}</p>
                 </div>
               </div>
@@ -56,20 +81,47 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* ── Lightbox Modal ── */}
       {lightbox !== null && (
-        <div className={styles.lightbox} onClick={() => setLightbox(null)} role="dialog" aria-modal="true" aria-label="Image viewer">
+        <div
+          className={styles.lightbox}
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image viewer"
+        >
           <button className={styles.lightboxClose} onClick={() => setLightbox(null)} aria-label="Close">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
           </button>
           <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
             <img src={filtered[lightbox].src} alt={filtered[lightbox].caption} />
-            <p className={styles.lightboxCaption}>{filtered[lightbox].caption}</p>
+            <div className={styles.lightboxMetaBar}>
+              <span className={styles.gridCategoryBadge}>{filtered[lightbox].category}</span>
+              <p className={styles.lightboxCaption}>{filtered[lightbox].caption}</p>
+            </div>
           </div>
           <div className={styles.lightboxNav}>
-            <button onClick={(e) => { e.stopPropagation(); setLightbox(lightbox > 0 ? lightbox - 1 : filtered.length - 1); }} aria-label="Previous">←</button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightbox(lightbox > 0 ? lightbox - 1 : filtered.length - 1);
+              }}
+              aria-label="Previous"
+            >
+              ←
+            </button>
             <span>{lightbox + 1} / {filtered.length}</span>
-            <button onClick={(e) => { e.stopPropagation(); setLightbox(lightbox < filtered.length - 1 ? lightbox + 1 : 0); }} aria-label="Next">→</button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightbox(lightbox < filtered.length - 1 ? lightbox + 1 : 0);
+              }}
+              aria-label="Next"
+            >
+              →
+            </button>
           </div>
         </div>
       )}

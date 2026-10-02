@@ -3,17 +3,28 @@
 import { use, useState } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { useCms } from '@/context/CmsContext';
 import { UPCOMING_EVENTS, PAST_EVENTS } from '@/data/content';
+import { getEventRegistrationState } from '@/lib/cms';
 import styles from './eventDetail.module.css';
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const event = [...UPCOMING_EVENTS, ...PAST_EVENTS].find((e) => e.id === id);
+  const { store } = useCms();
+
+  const allEvents = [...(store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS), ...(store.pastEvents?.length ? store.pastEvents : PAST_EVENTS)];
+  const event = allEvents.find((e) => e.id === id);
   if (!event) return notFound();
 
-  const isUpcoming = UPCOMING_EVENTS.some(e => e.id === id);
-  const upcomingEvent = isUpcoming ? UPCOMING_EVENTS.find(e => e.id === id) : null;
-  const pastEvent = !isUpcoming ? PAST_EVENTS.find(e => e.id === id) : null;
+  const upcomingList = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
+  const isUpcoming = upcomingList.some(e => e.id === id);
+  const upcomingEvent = isUpcoming ? upcomingList.find(e => e.id === id) : null;
+  const pastEvent = !isUpcoming ? (store.pastEvents?.length ? store.pastEvents : PAST_EVENTS).find(e => e.id === id) : null;
+
+  // Authoritative registration state check
+  const eventRegistrations = (store.registrations || []).filter(r => r.eventId === id);
+  const regState = getEventRegistrationState(event, eventRegistrations.length);
+  const isRegistrationAvailable = Boolean(isUpcoming && regState === 'Registration Open');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
@@ -28,7 +39,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           <Link href="/events" className={styles.backLink}>← All Events</Link>
           <div className={styles.heroMeta}>
             <span className="badge">{event.category}</span>
-            {isUpcoming && upcomingEvent?.registrationOpen && <span className="badge badge-success">Registration Open</span>}
+            {isUpcoming && regState === 'Registration Open' && <span className="badge badge-success">Registration Open</span>}
+            {isUpcoming && regState === 'Registration Full' && <span className="badge badge-warning">Registration Full</span>}
+            {isUpcoming && regState === 'Registration Closed' && <span className="badge badge-danger">Registration Closed</span>}
+            {isUpcoming && regState === 'Registration Not Open' && <span className="badge">Registration Not Open</span>}
           </div>
           <h1 className={styles.heroTitle}>{event.title}</h1>
           <div className={styles.heroDetails}>
@@ -115,11 +129,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               )}
 
               {/* FAQ */}
-              {upcomingEvent?.faq && upcomingEvent.faq.length > 0 && (
+              {(event.faq?.length ? event.faq : upcomingEvent?.faq)?.length ? (
                 <div className={styles.block}>
-                  <h3 className={styles.subHeading}>FAQ</h3>
+                  <h3 className={styles.subHeading}>Frequently Asked Questions</h3>
                   <div className={styles.faqList}>
-                    {upcomingEvent.faq.map((item, i) => (
+                    {(event.faq?.length ? event.faq : upcomingEvent?.faq || []).map((item, i) => (
                       <div key={i} className={styles.faqItem}>
                         <button className={styles.faqQuestion} onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
                           {item.question}
@@ -132,14 +146,32 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     ))}
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
 
             <aside className={styles.sidebar}>
-              {isUpcoming && upcomingEvent?.registrationOpen && (
-                <Link href={`/events/${event.id}/register`} className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                  Register Now
+              {isUpcoming && regState === 'Registration Open' && (
+                <Link href={`/events/${event.id}/register`} className="btn btn-primary btn-lg" style={{ width: '100%', textAlign: 'center' }}>
+                  Register for Event →
                 </Link>
+              )}
+              {isUpcoming && regState === 'Registration Full' && (
+                <div style={{ padding: '1rem', background: 'rgba(217, 119, 6, 0.1)', border: '1px solid #d97706', borderRadius: '8px', textAlign: 'center', marginBottom: '1.25rem' }}>
+                  <p style={{ color: '#d97706', fontWeight: 700, margin: 0 }}>Registration Full</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0.25rem 0 0' }}>Capacity limit of {event.capacity} attendees reached.</p>
+                </div>
+              )}
+              {isUpcoming && regState === 'Registration Closed' && (
+                <div style={{ padding: '1rem', background: 'rgba(196, 30, 30, 0.08)', border: '1px solid var(--brand-red)', borderRadius: '8px', textAlign: 'center', marginBottom: '1.25rem' }}>
+                  <p style={{ color: 'var(--brand-red)', fontWeight: 700, margin: 0 }}>Registration Closed</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0.25rem 0 0' }}>This event is not accepting registrations at this time.</p>
+                </div>
+              )}
+              {isUpcoming && regState === 'Registration Not Open' && (
+                <div style={{ padding: '1rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--color-border)', borderRadius: '8px', textAlign: 'center', marginBottom: '1.25rem' }}>
+                  <p style={{ fontWeight: 700, margin: 0 }}>Registration Not Open</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0.25rem 0 0' }}>Registration has not yet opened for this event.</p>
+                </div>
               )}
               {upcomingEvent?.eligibility && (
                 <div className={styles.sidebarBlock}>

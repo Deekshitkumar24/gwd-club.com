@@ -12,8 +12,20 @@
 .upcomingInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
 .upcomingGrid { display: flex; flex-direction: column; gap: var(--space-2xl); }
 
-.upcomingCard { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2xl); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color var(--duration-fast); }
-.upcomingCard:hover { border-color: var(--color-border-strong); }
+.upcomingCard {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color var(--duration-fast), transform var(--duration-fast);
+}
+.upcomingCard:hover { border-color: var(--brand-red); transform: translateY(-2px); }
 .upcomingCardFeatured { border-color: var(--color-accent); }
 .upcomingCardFeatured:hover { border-color: var(--color-accent-hover); }
 
@@ -38,11 +50,27 @@
 .filterBtnActive { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); }
 
 /* Past */
-.past { padding: var(--space-4xl) 0 var(--space-5xl); background: var(--color-bg-elevated); }
+.past {
+  padding: var(--space-4xl) 0 var(--space-5xl);
+  background: rgba(248, 248, 250, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 .pastInner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
 .pastGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-xl); }
 
-.pastCard { display: flex; flex-direction: column; border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color var(--duration-fast), transform var(--duration-fast); }
+.pastCard {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color var(--duration-fast), transform var(--duration-fast);
+}
 .pastCard:hover { border-color: var(--color-border-strong); transform: translateY(-2px); }
 .pastCardImage { aspect-ratio: 16/9; overflow: hidden; }
 .pastCardImage img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-slow) var(--ease-out); }

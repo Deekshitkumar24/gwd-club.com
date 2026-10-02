@@ -1,27 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useAnimations';
+import { useCms } from '@/context/CmsContext';
 import { UPCOMING_EVENTS, PAST_EVENTS } from '@/data/content';
+import Timeline, { JourneyItem, DEFAULT_TOP_JOURNEY, DEFAULT_BOTTOM_JOURNEY } from '@/components/ui/timeline';
+import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './events.module.css';
 
 export default function EventsPage() {
+  const { store } = useCms();
   const headerReveal = useReveal();
   const [activeYear, setActiveYear] = useState('all');
   const [activeCategory, setActiveCategory] = useState('all');
 
-  const years = ['all', ...new Set(PAST_EVENTS.map(e => e.year))];
-  const categories = ['all', ...new Set(PAST_EVENTS.map(e => e.category))];
+  const upcomingEvents = store.upcomingEvents?.length ? store.upcomingEvents : UPCOMING_EVENTS;
+  const pastEvents = store.pastEvents?.length ? store.pastEvents : PAST_EVENTS;
 
-  const filteredPastEvents = PAST_EVENTS.filter(e => {
+  // Derive storyline milestones from CMS store or fall back to default
+  const storylineItems: JourneyItem[] = store.timeline?.length
+    ? store.timeline.map((m, idx) => {
+        const itemAny = m as unknown as Record<string, string | undefined>;
+        return {
+          id: `timeline-${idx}`,
+          year: m.year,
+          month: itemAny.month || 'March',
+          headline: m.title,
+          content: itemAny.story || m.description || '',
+          image: m.image || '/img/vjit-inauguration.jpg',
+          track: idx % 2 === 0 ? 'top' : 'bottom',
+        };
+      })
+    : [...DEFAULT_TOP_JOURNEY, ...DEFAULT_BOTTOM_JOURNEY];
+
+  const years = ['all', ...new Set(pastEvents.map(e => e.year).filter((y): y is string => Boolean(y)))];
+  const categories = ['all', ...new Set(pastEvents.map(e => e.category))];
+
+  const filteredPastEvents = pastEvents.filter(e => {
     if (activeYear !== 'all' && e.year !== activeYear) return false;
     if (activeCategory !== 'all' && e.category !== activeCategory) return false;
     return true;
   });
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-dye-section="events">
       {/* Header */}
       <section className={styles.header}>
         <div className={styles.headerInner} ref={headerReveal.ref}>
@@ -38,13 +61,13 @@ export default function EventsPage() {
         <div className={styles.upcomingInner}>
           <h2 className={styles.sectionTitle}>Upcoming Events</h2>
 
-          {UPCOMING_EVENTS.length === 0 ? (
+          {upcomingEvents.length === 0 ? (
             <div className={styles.empty}>
               <p>Nothing scheduled yet. Check back soon.</p>
             </div>
           ) : (
             <div className={styles.upcomingGrid}>
-              {UPCOMING_EVENTS.map((event) => (
+              {upcomingEvents.map((event) => (
                 <UpcomingEventCard key={event.id} event={event} />
               ))}
             </div>
@@ -52,10 +75,35 @@ export default function EventsPage() {
         </div>
       </section>
 
+      {/* Past Events Horizontal Chronicle Timeline */}
+      <section style={{ borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+        <div style={{ padding: 'var(--space-3xl) var(--space-xl) var(--space-md)', textAlign: 'center' }}>
+          <span className="label" style={{ color: 'var(--brand-red)' }}>Chronicle Storyline</span>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: '0.25rem' }}>
+            Past Events Storyline
+          </h2>
+          <p style={{ color: 'var(--color-text-secondary)', maxWidth: '640px', margin: '0.5rem auto 0', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            Scroll down to walk through our past summits, hackathons, and tournament launches as the horizontal track pins and slides across milestones.
+          </p>
+        </div>
+        <Timeline
+          title="Events Storyline"
+          periodLabel="2024 — 2026"
+          activeColor="var(--brand-red, #C41E1E)"
+          backgroundColor="var(--color-bg, #ffffff)"
+          textColor="var(--color-text-primary, #121212)"
+          mutedTextColor="var(--color-text-secondary, #4A4A4A)"
+          imageUrl="/img/vjit-inauguration.jpg"
+          imageAlt="GWD Builder Chronicle & Milestones"
+          duration={1.2}
+          items={storylineItems}
+        />
+      </section>
+
       {/* Past Events */}
       <section className={styles.past}>
         <div className={styles.pastInner}>
-          <h2 className={styles.sectionTitle}>Past Events</h2>
+          <h2 className={styles.sectionTitle}>Past Events Archive</h2>
 
           {/* Filters */}
           <div className={styles.filters}>
@@ -108,6 +156,7 @@ function UpcomingEventCard({ event }: { event: typeof UPCOMING_EVENTS[0] }) {
 
   return (
     <div ref={ref} className={`${styles.upcomingCard} ${isFeatured ? styles.upcomingCardFeatured : ''} reveal ${isVisible ? 'visible' : ''}`}>
+      <BorderBeam size={280} duration={12} colorFrom="#E11D48" colorTo="#3B82F6" borderWidth={1.5} />
       <div className={styles.upcomingCardImage}>
         <img src={event.image} alt={event.title} loading="lazy" />
         {isFeatured && <span className={styles.featuredBadge}>Featured</span>}
@@ -140,6 +189,7 @@ function PastEventCard({ event }: { event: typeof PAST_EVENTS[0] }) {
 
   return (
     <Link href={`/events/${event.id}`} ref={ref} className={`${styles.pastCard} reveal ${isVisible ? 'visible' : ''}`}>
+      <BorderBeam size={220} duration={14} colorFrom="#E11D48" colorTo="#F59E0B" borderWidth={1.5} />
       <div className={styles.pastCardImage}>
         <img src={event.image} alt={event.title} loading="lazy" />
       </div>

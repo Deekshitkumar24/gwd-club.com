@@ -1,0 +1,396 @@
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL PRESENCE — SLIDE 9 ARCHITECTURE
+   "Built in Hyderabad. Working across 10 countries."
+   ═══════════════════════════════════════════════════════════════ */
+
+.globalPresenceSection {
+  padding: clamp(5.5rem, 8vw, 8.5rem) 0 clamp(4.5rem, 7vw, 7rem);
+  background: #0C0809;
+  color: #F7F0EC;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 232, 226, 0.1);
+  border-bottom: 1px solid rgba(255, 232, 226, 0.1);
+  z-index: 10;
+}
+
+/* Atmospheric Ambient Glowing Nebulas (exact Slide 9 colors) */
+.globalPresenceSection::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  right: 15%;
+  width: 55%;
+  height: 60%;
+  background: radial-gradient(36% 44% at 62% 40%, rgba(229, 23, 47, 0.35), transparent 70%);
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+}
+
+.globalPresenceSection::after {
+  content: '';
+  position: absolute;
+  bottom: -15%;
+  left: 0%;
+  width: 50%;
+  height: 55%;
+  background: radial-gradient(40% 50% at 4% 100%, rgba(110, 10, 22, 0.55), transparent 72%);
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: 0;
+}
+
+.presenceContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Top Meta Bar */
+.topMetaBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  font-family: var(--font-body, system-ui);
+  font-size: 13.5px;
+  color: rgba(247, 240, 236, 0.46);
+  border-bottom: 1px solid rgba(255, 232, 226, 0.08);
+  padding-bottom: 1rem;
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandBadge {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #E5172F;
+  border: 1px solid rgba(229, 23, 47, 0.4);
+  background: rgba(229, 23, 47, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.chapterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(247, 240, 236, 0.75);
+}
+
+.chapterGroup::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E5172F;
+  box-shadow: 0 0 10px #E5172F;
+}
+
+/* Header Grid */
+.mapHead {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.mainHeadline {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(2.5rem, 5.2vw, 4.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: #F7F0EC;
+  margin: 0;
+}
+
+.leadText {
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(247, 240, 236, 0.72);
+  margin: 0;
+}
+
+/* Map Canvas Container */
+.mapBox {
+  position: relative;
+  width: 100%;
+  margin: 1.5rem 0 2rem;
+  border-radius: 16px;
+  overflow: visible;
+}
+
+/* SVG Styles */
+.mapBox :global(svg.wmap) {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.mapBox :global(.wmap__sphere) {
+  fill: none;
+  stroke: none;
+}
+
+.mapBox :global(.wmap__grat path) {
+  fill: none;
+  stroke: rgba(255, 236, 230, 0.05);
+  stroke-width: 0.5px;
+}
+
+.mapBox :global(.wmap__base path) {
+  fill: rgba(255, 236, 230, 0.085);
+  stroke: #0C0809;
+  stroke-width: 0.4px;
+}
+
+.mapBox :global(.wmap__hi path) {
+  fill: rgba(229, 23, 47, 0.42);
+  stroke: #FF4A5E;
+  stroke-width: 0.7px;
+  opacity: 1;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), fill 0.4s ease;
+}
+
+.mapBox :global(.arc) {
+  fill: none;
+  stroke: #FF4A5E;
+  stroke-width: 1.1px;
+  opacity: 0.75;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.mapBox :global(.arc-p) {
+  fill: none;
+  stroke: #FFFFFF;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  stroke-dasharray: 0.05 0.95;
+  stroke-dashoffset: 1;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 4px #FF4A5E);
+  animation: packetFlow 2.8s linear infinite;
+}
+
+@keyframes packetFlow {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.mapBox :global(.mk) {
+  opacity: 1;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mapBox :global(.mk:hover) {
+  transform: scale(1.4);
+}
+
+.mapBox :global(.mk__ring) {
+  fill: rgba(229, 23, 47, 0.22);
+}
+
+.mapBox :global(.mk__d) {
+  fill: #FFFFFF;
+}
+
+.mapBox :global(.mk--hq .mk__ring) {
+  fill: rgba(229, 23, 47, 0.35);
+  animation: mkPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes mkPulse {
+  0%, 100% { opacity: 0.45; r: 12; }
+  50% { opacity: 1; r: 18; }
+}
+
+.mapBox :global(.mk--hq .mk__halo) {
+  fill: #E5172F;
+  stroke: #FFFFFF;
+  stroke-width: 1.2px;
+}
+
+.mapBox :global(.mk--hq .mk__d) {
+  fill: #FFFFFF;
+}
+
+.mapBox :global(.wmap__lb text) {
+  font-family: var(--font-body, system-ui);
+  font-size: 11px;
+  font-weight: 600;
+  fill: #F7F0EC;
+  opacity: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.mapBox :global(.wmap__lb text.hq) {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 800;
+  font-size: 15px;
+  fill: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+
+.mapBox :global(.wmap__lb text.hq-s) {
+  font-size: 9px;
+  fill: rgba(247, 240, 236, 0.55);
+  font-weight: 500;
+}
+
+.mapBox :global(.wmap__lb .lead-l) {
+  stroke: rgba(255, 232, 226, 0.35);
+  stroke-width: 0.6px;
+  fill: none;
+  opacity: 1;
+}
+
+/* Country Pill Chips (Exact Slide 9 Footer) */
+.chipsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.countryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 232, 226, 0.12);
+  color: rgba(247, 240, 236, 0.72);
+  background: rgba(255, 238, 232, 0.025);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-body, system-ui);
+}
+
+.countryChip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF4A5E;
+}
+
+.countryChip:hover {
+  border-color: rgba(229, 23, 47, 0.4);
+  color: #FFFFFF;
+  background: rgba(255, 238, 232, 0.06);
+  transform: translateY(-1px);
+}
+
+.countryChipHq {
+  color: #FFFFFF;
+  border-color: rgba(229, 23, 47, 0.55);
+  background: rgba(229, 23, 47, 0.14);
+  font-weight: 600;
+}
+
+.countryChipHq::before {
+  background: #FFFFFF;
+  box-shadow: 0 0 6px #FFFFFF;
+}
+
+.countryChipActive {
+  border-color: #FF4A5E;
+  background: rgba(229, 23, 47, 0.25);
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(229, 23, 47, 0.3);
+}
+
+/* Floating Detail Card for Focused Country */
+.activeHubDetailBar {
+  margin-top: 1.5rem;
+  background: rgba(21, 14, 16, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 23, 47, 0.35);
+  border-radius: 12px;
+  padding: 0.9rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  animation: barReveal 0.25s ease-out;
+}
+
+@keyframes barReveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hubDetailLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hubDetailFlag {
+  font-size: 1.5rem;
+}
+
+.hubDetailTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.hubDetailRole {
+  font-size: 0.8rem;
+  color: rgba(247, 240, 236, 0.65);
+  margin: 0;
+}
+
+.hubDetailPill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FF5A6E;
+  background: rgba(229, 23, 47, 0.15);
+  border: 1px solid rgba(229, 23, 47, 0.35);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .mapHead {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .mainHeadline {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+  }
+
+  .activeHubDetailBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

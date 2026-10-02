@@ -1,320 +1,512 @@
 /* ============================================================
    GWD — GET WORK DONE
-   Content data for the GWD website.
-   All content is editable placeholder data.
+   Primary Source of Truth Content Data
+   Source: GWD Overview.html & Official Company Records
+   GWD Global Pvt. Ltd. · Madhapur, Hyderabad · GWD Club at VJIT
    ============================================================ */
 
-// ── Club Info ──
+// ── Corporate & Club Information ──
 export const CLUB = {
   name: 'GWD',
-  fullName: 'Get Work Done',
-  tagline: 'A student collective that turns ideas into shipped work — tech, design, and everything between.',
-  shortDescription: 'A student collective that turns ideas into shipped work across technology, design, events, community, and everything between.',
-  longDescription: 'GWD is a community of makers, thinkers, and builders who believe that the best ideas happen when disciplines collide. We bring together students from engineering, design, arts, and business to create projects, host events, and build experiences that matter.',
-  mission: 'To create a space where students from diverse backgrounds collaborate to build meaningful projects and grow as creators.',
-  vision: 'To be the most impactful student-led creative collective in the country — known for our work, our events, and our people.',
-  founded: 2019,
-  college: 'National Institute of Technology',
-  email: 'hello@gwd.club',
-  phone: '+91 98765 43210',
-  address: 'Student Activity Center, NIT Campus, Block C',
+  fullName: 'GWD Global Pvt. Ltd.',
+  companyName: 'GWD Global Pvt. Ltd.',
+  clubName: 'GWD Club',
+  campus: 'VJIT (Vidya Jyothi Institute of Technology), Hyderabad',
+  campusBase: 'VJIT (Vidya Jyothi Institute of Technology), Hyderabad',
+  hq: 'Madhapur, Hyderabad, Telangana, India',
+  registeredOffice: 'Madhapur, Hyderabad, Telangana, India',
+  cin: 'U63999TS2025PTC199800',
+  gstin: '36AAMCG1250H1ZP',
+  incorporationDate: '12 June 2025',
+  incorporated: '12 June 2025',
+  inceptionDate: 'March 2024 (Student Initiative)',
+  foundingDate: 'March 2024',
+  tagline: 'Your Vision. Our Expertise.',
+  motto: 'GET WORK DONE.',
+  description:
+    'GWD Global Pvt. Ltd. — a student idea from March 2024, a registered company since 12 June 2025. Operating across borders, delivering without boundaries across enterprise software, design systems, and digital sports infrastructure.',
+  shortDescription:
+    'A student-founded technology and creative powerhouse that turns ideas into shipped work — tech, design, and everything between.',
+  longDescription:
+    'GWD is a high-velocity collective of engineers, designers, and organizers born from a student idea in March 2024 at VJIT, and officially incorporated on 12 June 2025 in Madhapur, Hyderabad. We operate across 10 countries delivering production software, grassroots sports operating systems, and creative campaigns.',
+  clubDescription:
+    'The student builder community behind GWD Club at VJIT — turning ideas into shipped work across technology, design, events, and media.',
+  mission:
+    'To build production-grade technology, design systems, and platforms that solve real-world problems while transforming ambitious students into world-class builders.',
+  vision:
+    'To be the benchmark student-founded innovation collective and global technology partner, delivering without boundaries across borders and industries.',
+  companyHeadline: 'One company. Three arms.',
+  companySubheadline:
+    'GWD Global Private Limited: headquartered in Madhapur, Hyderabad, and registered with the Government of India (MCA) in 2025.',
+  studentIdeaHeadline: 'It started as a student idea',
+  studentIdeaStory:
+    "In March 2024, a handful of students saw a gap: skilled young people couldn't get real client work, and real clients couldn't find affordable, capable teams. GWD put itself in the middle. The name never changed, because the mission never did.",
+  notAnotherClubHeadline: "We didn't build another college club",
+  notAnotherClubStory:
+    "Most students graduate without ever working on something real. That's the exact gap GWD was started to close in 2024, and the club brings it to every student on campus.\n\nGWD Club runs like a company because a real company stands behind it: departments, deadlines, live work, and accountability.",
+  vjitInauguration:
+    "Launched at VJIT in 2025 as the biggest club inauguration in the college's 25-year history, with Meraj Faheem (CEO, Telangana Innovation Cell) and Sadiya Sabira (CEO, Code for India) as chief guests.",
+  accolades: [
+    'Top 500 Upcoming Startups of Asia · E-Cell Bombay',
+    'Top 25 of India · E-Cell Bombay',
+  ],
+  email: 'contact@gwd-club.com',
+  phone: '+91 91212 99800',
+  address: 'GWD Global Pvt. Ltd., Madhapur, Hyderabad, Telangana 500081 · GWD Club at VJIT, Hyderabad',
   socials: {
     instagram: 'https://instagram.com/gwdclub',
+    linkedin: 'https://linkedin.com/company/gwd-global',
     twitter: 'https://twitter.com/gwdclub',
-    linkedin: 'https://linkedin.com/company/gwdclub',
-    youtube: 'https://youtube.com/@gwdclub',
     github: 'https://github.com/gwdclub',
   },
 };
 
-// ── Statistics ──
+// ── Official Verified Statistics (Slide 4) ──
 export const STATS = [
-  { label: 'Events', value: 48, suffix: '+' },
-  { label: 'Projects', value: 32, suffix: '' },
-  { label: 'Members', value: 120, suffix: '+' },
-  { label: 'Collaborations', value: 15, suffix: '' },
-  { label: 'Years', value: 6, suffix: '' },
+  { label: 'Freelance Network', value: 650, suffix: '+', desc: 'Builders, designers, and engineers across our active network' },
+  { label: 'Projects Delivered', value: 230, suffix: '+', desc: 'Shipped production systems and creative deliverables' },
+  { label: 'Countries Operating', value: 10, suffix: '', desc: 'Global operations spanning 3 continents' },
+  { label: 'Core Team', value: 18, suffix: '+', desc: 'Specialized executive and operations layer' },
+  { label: 'Revenue Booked', value: 1.78, suffix: 'Cr', prefix: '₹', desc: 'Booked across services and product lines' },
+  { label: 'Collective Valuation', value: 7.3, suffix: 'Cr', prefix: '₹', desc: 'Combined enterprise value held across the group' },
 ];
 
-// ── Activities ──
-export const ACTIVITIES = [
-  {
-    id: 'events',
-    title: 'Events',
-    description: 'Large-scale tech and creative events that bring together hundreds of participants from across the country.',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
-  },
-  {
-    id: 'projects',
-    title: 'Projects',
-    description: 'Real-world projects built by teams of students — from apps and platforms to hardware prototypes and research papers.',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
-  },
-  {
-    id: 'workshops',
-    title: 'Workshops',
-    description: 'Hands-on learning sessions led by industry professionals and experienced club members covering cutting-edge technologies.',
-    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&q=80',
-  },
-  {
-    id: 'competitions',
-    title: 'Competitions',
-    description: 'Hackathons, design challenges, and creative competitions that push members to solve complex problems under pressure.',
-    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&q=80',
-  },
-  {
-    id: 'community',
-    title: 'Community',
-    description: 'A tight-knit network of alumni, mentors, and peers who support each other\'s growth and professional development.',
-    image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80',
-  },
-  {
-    id: 'creative',
-    title: 'Creative Work',
-    description: 'Photography, videography, graphic design, and multimedia storytelling that captures campus life and culture.',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80',
-  },
-];
+// ── The Three Arms of GWD (Slide 2: "One company. Three arms.") ──
+export interface CompanyArm {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  highlighted?: boolean;
+  tag?: string;
+  badge?: {
+    text: string;
+    statusDot?: boolean;
+  };
+  metrics?: {
+    value: string;
+    label: string;
+  }[];
+}
 
-// ── Projects ──
-export const PROJECTS = [
+export const THREE_ARMS: CompanyArm[] = [
   {
-    id: 'campus-connect',
-    title: 'Campus Connect',
-    year: '2025',
-    category: 'Platform',
-    shortDescription: 'A unified platform connecting students across departments for collaboration, resource sharing, and event discovery.',
-    description: 'Campus Connect reimagined how students find collaborators and resources on campus. Built over 3 months by a team of 8, the platform serves over 2,000 active users and has facilitated 500+ project collaborations.',
-    heroImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1400&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80',
+    id: 'gwd-global',
+    name: 'GWD Global',
+    subtitle: 'Projects & freelancing',
+    description:
+      'The core business. Teams from our network deliver client work across 15 practices: software, web and mobile, AI and automation, cloud, design, branding and media production.',
+    metrics: [
+      { value: '230+', label: 'projects delivered' },
+      { value: '10', label: 'countries' },
     ],
-    outcome: '2,000+ active users within 3 months of launch',
-    collaborators: ['CS Department', 'Design Club'],
-    link: '#',
-    beforeImage: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80',
   },
   {
-    id: 'echo-festival',
-    title: 'Echo Festival',
-    year: '2024',
-    category: 'Event',
-    shortDescription: 'A three-day immersive tech and art festival featuring 20 speakers, 15 workshops, and 500 attendees.',
-    description: 'Echo Festival was our flagship event — a celebration of technology, art, and human creativity. The festival brought together industry leaders, artists, and students for three days of talks, performances, and collaborative projects.',
-    heroImage: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1400&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
-      'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=80',
-    ],
-    outcome: '500 attendees, 95% satisfaction rate',
-    collaborators: ['TechCorp', 'Creative Labs'],
-    link: '#',
-    beforeImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
+    id: 'gwd-sports',
+    name: 'GWD Sports',
+    subtitle: "India's grassroots sports ecosystem",
+    description:
+      "The digital backbone for sports academies: academy management, a Student Sports Passport, and live leagues. Early stage, and already running the Hyderabad Super League's ten clubs.",
+    badge: {
+      text: 'Early stage, live',
+      statusDot: true,
+    },
   },
   {
-    id: 'green-campus',
-    title: 'Green Campus Initiative',
-    year: '2024',
-    category: 'Social Impact',
-    shortDescription: 'A sustainability monitoring system tracking energy usage, waste management, and carbon footprint across campus.',
-    description: 'The Green Campus Initiative was a collaboration with the university administration to build a real-time sustainability dashboard. Using IoT sensors and data visualization, the project helped reduce campus energy consumption by 15%.',
-    heroImage: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1400&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80',
-      'https://images.unsplash.com/photo-1518173946687-a26bc02af5a4?w=800&q=80',
-    ],
-    outcome: '15% reduction in campus energy consumption',
-    collaborators: ['Environmental Science Dept', 'Facilities Management'],
-    link: '#',
-    beforeImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=800&q=80',
-  },
-  {
-    id: 'soundscape',
-    title: 'Soundscape',
-    year: '2023',
-    category: 'Creative',
-    shortDescription: 'An interactive audio-visual installation that translated campus sounds into generative art.',
-    description: 'Soundscape was an art-meets-technology experiment. We placed microphones across campus and used real-time audio processing to generate abstract visual art projected onto the library facade for a week-long exhibition.',
-    heroImage: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1400&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80',
-      'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80',
-    ],
-    outcome: '3,000+ viewers over the exhibition week',
-    collaborators: ['Fine Arts Department', 'Music Club'],
-    link: '#',
-    beforeImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80',
+    id: 'gwd-club-community',
+    name: 'GWD Club & Community',
+    subtitle: 'One community, on campus and beyond',
+    description:
+      "The club and the community are one. It's where students work like professionals before they graduate. Started at VJIT, now expanding to more colleges.",
+    highlighted: true,
+    tag: "• You're part of this one",
   },
 ];
 
-// ── Events ──
-export const UPCOMING_EVENTS = [
+// ── Global Presence Across 10 Countries (Slide 6) ──
+export interface CountryPresence {
+  country: string;
+  city: string;
+  isHq: boolean;
+  role: string;
+}
+
+export const GLOBAL_PRESENCE: CountryPresence[] = [
+  { country: 'India', city: 'Hyderabad', isHq: true, role: 'Global Headquarters (Madhapur) & VJIT Campus' },
+  { country: 'United Arab Emirates', city: 'Dubai', isHq: false, role: 'Middle East Regional Operations' },
+  { country: 'Saudi Arabia', city: 'Riyadh', isHq: false, role: 'Enterprise Client Operations' },
+  { country: 'Qatar', city: 'Doha', isHq: false, role: 'Sports & Technology Partner Hub' },
+  { country: 'Kuwait', city: 'Kuwait City', isHq: false, role: 'Client Operations' },
+  { country: 'Turkey', city: 'Istanbul', isHq: false, role: 'Design & Engineering Hub' },
+  { country: 'United Kingdom', city: 'London', isHq: false, role: 'European Delivery' },
+  { country: 'Germany', city: 'Berlin', isHq: false, role: 'Technology & Enterprise Solutions' },
+  { country: 'Singapore', city: 'Singapore', isHq: false, role: 'Asia-Pacific Operations' },
+  { country: 'Canada', city: 'Toronto', isHq: false, role: 'North America Presence' },
+];
+
+// ── Ventures & Product Lines (Slide 4, 12, 14) ──
+export interface ProductVenture {
+  id: string;
+  name: string;
+  tagline: string;
+  status: 'Live & Earning' | 'In Development' | 'In Design';
+  currentMrr?: string;
+  targetLaunch?: string;
+  projectedArr?: {
+    conservative: string;
+    baseCase: string;
+    ambitious: string;
+  };
+  description: string;
+  partners?: string[];
+  clubsInLeague?: string[];
+}
+
+export const PRODUCTS_VENTURES: ProductVenture[] = [
   {
-    id: 'gwd-summit-2025',
-    title: 'GWD Summit 2025',
-    date: '2025-11-15',
-    time: '09:00 AM — 06:00 PM',
-    location: 'Main Auditorium, NIT Campus',
-    shortDescription: 'Our annual flagship summit bringing together industry leaders, innovators, and students for a day of talks, workshops, and networking.',
-    description: 'GWD Summit is our marquee annual event — a full-day conference that connects students with industry leaders across technology, design, and entrepreneurship. This year, we are focusing on AI, creative technology, and sustainable innovation.',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1400&q=80',
-    registrationOpen: true,
+    id: 'gwd-sports',
+    name: 'GWD Sports',
+    tagline: 'Grassroots Sports Operating System & Infrastructure',
+    status: 'Live & Earning',
+    currentMrr: '₹1.25L',
+    projectedArr: {
+      conservative: '₹85L',
+      baseCase: '₹1.25Cr',
+      ambitious: '₹2.8Cr',
+    },
+    description:
+      'The first end-to-end digital simulation of a grassroots sports operation in India. Built from scratch by GWD, covering registration, player passports, attendance, fees, live standings, and tournament operation in one connected system.',
+    partners: ['Hyderabad Super League', 'Sreenidi Deccan FC', 'Hyderabad Little Stars', 'MasterGrade'],
+    clubsInLeague: [
+      'Champions FC',
+      'Deccan United FC',
+      'Gladiators FC',
+      'Guardians FC',
+      'Hopeless FC',
+      'IEA FC',
+      'Knockout FC',
+      'Strangers Stars FC',
+      'Trail Blazers FC',
+      'Warriors FC',
+    ],
+  },
+  {
+    id: 'next-bridge',
+    name: 'Next Bridge',
+    tagline: 'Property Management Platform',
+    status: 'In Development',
+    targetLaunch: '2026',
+    description:
+      'An intelligent digital property management ecosystem connecting property owners, tenants, and maintenance facilities with automated work order dispatching.',
+  },
+  {
+    id: 'torqio',
+    name: 'Torqio',
+    tagline: 'Automotive Marketplace',
+    status: 'In Design',
+    targetLaunch: 'Q3',
+    description:
+      'Next-generation digital automotive marketplace combining verified vehicle provenance, digital inspection reports, and direct enthusiast builds.',
+  },
+];
+
+export const VENTURES = PRODUCTS_VENTURES;
+
+export const SPORTS_CLUBS = [
+  { name: 'Champions FC', logo: '/logos/champions-fc.png' },
+  { name: 'Deccan United FC', logo: '/logos/deccan-united-fc.png' },
+  { name: 'Gladiators FC', logo: '/logos/gladiators-fc.png' },
+  { name: 'Guardians FC', logo: '/logos/guardians-fc.png' },
+  { name: 'Hopeless FC', logo: '/logos/hopeless-fc.png' },
+  { name: 'IEA FC', logo: '/logos/iea-fc.png' },
+  { name: 'Knockout FC', logo: '/logos/knockout-fc.png' },
+  { name: 'Strangers Stars FC', logo: '/logos/strangers-stars-fc.png' },
+  { name: 'Trail Blazers FC', logo: '/logos/trail-blazers-fc.png' },
+  { name: 'Warriors FC', logo: '/logos/warriors-fc.png' },
+  { name: 'Sreenidi Deccan FC', logo: '/logos/sreenidi-deccan-fc.png' },
+  { name: 'Hyderabad Little Stars', logo: '/logos/hyderabad-little-stars.png' },
+];
+
+// ── Institutional Innovation Network (Slide 8) ──
+export interface PartnerInstitution {
+  id: string;
+  name: string;
+  category: 'Government & Innovation' | 'Ecosystem & Incubation';
+  logo: string;
+}
+
+export const INSTITUTIONAL_PARTNERS: PartnerInstitution[] = [
+  { id: 'tgic', name: 'TGIC', category: 'Government & Innovation', logo: '/logos/tgic.png' },
+  { id: 't-hub', name: 'T-Hub', category: 'Government & Innovation', logo: '/logos/t-hub.png' },
+  { id: 'k-tech', name: 'K-Tech Innovation Hub', category: 'Government & Innovation', logo: '/logos/k-tech-innovation-hub.png' },
+  { id: 'gwd-club', name: 'GWD Club', category: 'Ecosystem & Incubation', logo: '/logos/gwd-club.png' },
+  { id: 'edventure-park', name: 'Edventure Park', category: 'Ecosystem & Incubation', logo: '/logos/edventure-park.png' },
+  { id: 'studlyf', name: 'Studlyf', category: 'Ecosystem & Incubation', logo: '/logos/studlyf.png' },
+  { id: 'tg10x', name: 'TG10X', category: 'Ecosystem & Incubation', logo: '/logos/tg10x.png' },
+  { id: 'bharat-startup', name: 'Bharat Startup', category: 'Ecosystem & Incubation', logo: '/logos/bharat-startup.png' },
+  { id: 'e-cell', name: 'E-Cell', category: 'Ecosystem & Incubation', logo: '/logos/e-cell.png' },
+];
+
+// ── Clients & Partners (Slide 10) ──
+export interface ClientPartner {
+  name: string;
+  logo: string;
+  tier?: string;
+}
+
+export const CLIENT_PARTNERS: ClientPartner[] = [
+  { name: 'Accenture', logo: '/logos/accenture.png' },
+  { name: 'FedEx', logo: '/logos/fedex.png' },
+  { name: 'ADP', logo: '/logos/adp.png' },
+  { name: 'Adani Connex', logo: '/logos/adani-connex.png' },
+  { name: 'Al Ansari International', logo: '/logos/al-ansari-international.png' },
+  { name: 'Saudi Energy', logo: '/logos/saudi-energy.png' },
+  { name: 'Focus Softnet', logo: '/logos/focus-softnet.png' },
+  { name: 'Unifonic', logo: '/logos/unifonic.png' },
+  { name: 'Waabi', logo: '/logos/waabi.png' },
+  { name: 'AlayaCare', logo: '/logos/alayacare.png' },
+  { name: 'Synthesia', logo: '/logos/synthesia.png' },
+  { name: 'D&B Properties', logo: '/logos/d-amp-b-properties.png' },
+  { name: 'Electra', logo: '/logos/electra.png' },
+  { name: 'Skello', logo: '/logos/skello.png' },
+  { name: 'BrioHR', logo: '/logos/briohr.png' },
+  { name: 'CIEL HR', logo: '/logos/ciel-hr.png' },
+  { name: 'Red String HR', logo: '/logos/red-string-hr.png' },
+  { name: 'Pearl Constructions', logo: '/logos/pearl-constructions.png' },
+  { name: 'Shopezy', logo: '/logos/shopezy.png' },
+  { name: 'Intex', logo: '/logos/intex.png' },
+  { name: 'MasterGrade', logo: '/logos/mastergrade.png' },
+  { name: 'Xentrox', logo: '/logos/xentrox.png' },
+  { name: 'Carrera Pictures', logo: '/logos/carrera-pictures.png' },
+  { name: 'Good Mind', logo: '/logos/good-mind.png' },
+];
+
+export const CLIENT_DISCLAIMER =
+  'Includes direct clients and partners reached through agencies, intermediaries and channel partners.';
+
+// ── Collaborations Full Array (For /collaborate page) ──
+export interface CollaborationItem {
+  id: string;
+  name: string;
+  type: string;
+  year: string;
+  description: string;
+  outcome: string;
+  logo: string;
+  image: string;
+  featured: boolean;
+}
+
+export const COLLABORATIONS: CollaborationItem[] = [
+  {
+    id: 'hyderabad-super-league',
+    name: 'Hyderabad Super League',
+    type: 'Sports OS & League Partner',
+    year: '2025–Present',
+    description:
+      'GWD is the exclusive IT and digital partner powering the entire grassroots tournament operating system, player passports, and live league standings.',
+    outcome: '10 clubs actively running on platform · Real-time scoring and standings',
+    logo: '/logos/hyderabad-super-league.png',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
     featured: true,
-    category: 'Conference',
-    speakers: [
-      { name: 'Arjun Mehta', role: 'CTO, TechVentures', topic: 'Building AI-First Products' },
-      { name: 'Priya Sharma', role: 'Design Director, CreativeLab', topic: 'Design for the Next Billion Users' },
-      { name: 'Dr. Ravi Kumar', role: 'Professor, IIT', topic: 'The Future of Computing' },
-    ],
-    schedule: [
-      { time: '09:00', title: 'Registration & Networking', description: 'Check in and connect with other attendees' },
-      { time: '10:00', title: 'Opening Keynote', description: 'Setting the stage for the day' },
-      { time: '11:00', title: 'Panel Discussion', description: 'AI, Creativity, and the Future of Work' },
-      { time: '12:30', title: 'Lunch Break', description: 'Networking lunch' },
-      { time: '14:00', title: 'Workshop Track A', description: 'Hands-on AI prototyping' },
-      { time: '14:00', title: 'Workshop Track B', description: 'Design thinking masterclass' },
-      { time: '16:00', title: 'Showcase', description: 'Student project presentations' },
-      { time: '17:30', title: 'Closing & Awards', description: 'Wrap-up and recognition' },
-    ],
-    eligibility: 'Open to all college students with a valid ID',
-    instructions: ['Bring your laptop for workshops', 'Lunch will be provided', 'Certificates will be issued to attendees'],
-    faq: [
-      { question: 'Is there a registration fee?', answer: 'No, the event is free for all college students.' },
-      { question: 'Can I attend individual sessions?', answer: 'Yes, you can choose your sessions after registration.' },
-      { question: 'Will the sessions be recorded?', answer: 'Select sessions will be available on our YouTube channel.' },
-    ],
-    collaborators: ['TechVentures', 'CreativeLab', 'NIT Alumni Association'],
   },
   {
-    id: 'design-sprint',
-    title: 'Design Sprint Weekend',
-    date: '2025-10-20',
-    time: '10:00 AM — 05:00 PM',
-    location: 'Innovation Hub, Block D',
-    shortDescription: 'A 48-hour intensive design sprint where teams solve real-world problems using design thinking methodology.',
-    description: 'Teams of 4 will tackle real challenges from partner organizations using Google\'s Design Sprint methodology. Mentors from industry will guide each team through the process.',
-    image: 'https://images.unsplash.com/photo-1531498860502-7c67cf02f657?w=1400&q=80',
-    registrationOpen: true,
+    id: 'tgic-t-hub',
+    name: 'T-Hub & TGIC',
+    type: 'Innovation & Incubation Body',
+    year: '2024–Present',
+    description:
+      'Government innovation bodies and startup ecosystem backing GWD build velocity, student entrepreneurship, and product incubation.',
+    outcome: 'Incubation mentorship · Scaling support across Telangana',
+    logo: '/logos/t-hub.png',
+    image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80',
+    featured: true,
+  },
+  {
+    id: 'sreenidi-deccan-fc',
+    name: 'Sreenidi Deccan FC',
+    type: 'Football Academy Partner',
+    year: '2025–Present',
+    description:
+      'Digital infrastructure partnership implementing academy management, attendance, and player development tracking.',
+    outcome: 'Academy operations digitized',
+    logo: '/logos/sreenidi-deccan-fc.png',
+    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80',
+    featured: true,
+  },
+  {
+    id: 'edventure-park',
+    name: 'Edventure Park',
+    type: 'Startup Ecosystem Partner',
+    year: '2024–Present',
+    description:
+      'Collaborative cohort acceleration supporting student startup founders and rapid prototyping sprints.',
+    outcome: 'Student ventures incubated across cohorts',
+    logo: '/logos/edventure-park.png',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
+    featured: true,
+  },
+  {
+    id: 'mastergrade',
+    name: 'MasterGrade',
+    type: 'Sports Education Partner',
+    year: '2025',
+    description:
+      'Integration of curriculum tracking and athlete skill progression into the GWD Sports management ecosystem.',
+    outcome: 'Integrated skills evaluation framework',
+    logo: '/logos/mastergrade.png',
+    image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
     featured: false,
-    category: 'Workshop',
-    speakers: [],
-    schedule: [],
-    eligibility: 'Teams of 3-5 members, any department',
-    instructions: ['Register as a team', 'Bring laptops and sketchbooks'],
-    faq: [],
-    collaborators: ['DesignHQ'],
   },
 ];
 
-export const PAST_EVENTS = [
+// ── Disciplines (What We Do) ──
+export const DISCIPLINES = [
   {
-    id: 'hackathon-2024',
-    title: 'Code & Create Hackathon',
-    date: '2024-09-10',
-    time: '09:00 AM — 09:00 PM',
-    location: 'Computer Science Block',
-    shortDescription: 'A 12-hour hackathon focused on building solutions for campus life.',
-    description: 'Over 200 students participated in our annual hackathon. Teams built everything from a campus navigation app to an automated library system.',
-    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1400&q=80',
-    category: 'Hackathon',
-    year: '2024',
-    results: '1st Place: CampusNav, 2nd Place: LibBot, 3rd Place: StudyMatch',
-    highlights: ['200+ participants', '45 teams', '12 hours of coding', '₹50,000 prize pool'],
-    gallery: [
-      'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80',
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80',
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
-    ],
+    index: '01',
+    title: 'Technology & Platforms',
+    desc: 'Engineering production web systems, platforms, and real-time tournament infrastructure that powers organizations across India and globally.',
+    tags: ['Full-Stack Systems', 'Sports OS', 'Real-Time APIs', 'Cloud Architecture'],
+    deliverables: 'Internal platforms, Grassroots sports software, developer tools, custom web architectures',
   },
   {
-    id: 'photography-walk',
-    title: 'Campus Through the Lens',
-    date: '2024-03-15',
-    time: '06:00 AM — 10:00 AM',
-    location: 'Campus Wide',
-    shortDescription: 'An early morning photography walk capturing the beauty of campus in golden hour.',
-    description: 'Our photography team led a group of 40 students on a guided photo walk, teaching composition, lighting, and storytelling through images.',
-    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1400&q=80',
-    category: 'Creative',
-    year: '2024',
-    results: 'Top 20 photographs exhibited in the campus gallery',
-    highlights: ['40 participants', 'Professional camera equipment provided', 'Exhibition in campus gallery'],
-    gallery: [
-      'https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=800&q=80',
-      'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=80',
-    ],
+    index: '02',
+    title: 'Design & Visual Systems',
+    desc: 'Crafting brand identities, design systems, editorial layouts, and user experiences with uncompromising typographic and visual discipline.',
+    tags: ['Design Systems', 'Design Tokens', 'Interaction Design', 'Brand Architecture'],
+    deliverables: 'Brand guidelines, digital interfaces, interactive prototypes, design tokens',
   },
   {
-    id: 'tech-talk-series',
-    title: 'Tech Talk Series: Web3',
-    date: '2023-11-20',
-    time: '04:00 PM — 06:00 PM',
-    location: 'Seminar Hall A',
-    shortDescription: 'An industry expert-led session exploring the fundamentals and future of decentralized technologies.',
-    description: 'Part of our ongoing Tech Talk series, this session featured a senior engineer from a leading blockchain company discussing real-world applications of Web3 technology.',
-    image: 'https://images.unsplash.com/photo-1591115765373-5f9cf1da241c?w=1400&q=80',
-    category: 'Talk',
-    year: '2023',
-    results: 'Highly rated by attendees, follow-up workshop planned',
-    highlights: ['120 attendees', 'Live demo of smart contracts', 'Q&A with industry expert'],
-    gallery: [
-      'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80',
-    ],
+    index: '03',
+    title: 'Events & Hackathons',
+    desc: 'Organizing national-scale hackathons, technical workshops, builder sprints, and creative showcases that gather hundreds of creators.',
+    tags: ['Hackathons', 'Summits', 'Design Sprints', 'Technical Showcases'],
+    deliverables: '48-hour sprints, live event production, campus gatherings, builder competitions',
+  },
+  {
+    index: '04',
+    title: 'Media & Storytelling',
+    desc: 'Producing cinematic video, documentary captures, photography, and recaps that chronicle the builder journey from concept to shipped product.',
+    tags: ['Cinematic Video', 'Recap Films', 'Editorial Stories', 'Live Photography'],
+    deliverables: 'Short films, documentary captures, event recaps, builder interviews',
   },
 ];
 
-// ── Event Workflow ──
-export const EVENT_WORKFLOW = [
+// ── Strict 9-Slot Leadership Hierarchy (Slide 18) ──
+export interface LeaderSlot {
+  slot: number;
+  id: string;
+  name: string;
+  role: string;
+  photo?: string;
+  hasCustomPhoto: boolean;
+  bio: string;
+  quote?: string;
+  deliverables: string[];
+  skills?: string[];
+  socials?: Record<string, string>;
+  projects?: string[];
+  tier?: string;
+}
+
+export const NINE_LEADERS: LeaderSlot[] = [
   {
-    step: 1,
-    title: 'Announcement',
-    description: 'We announce the event across all our channels — social media, campus posters, and our website. Every announcement includes dates, eligibility, and what to expect.',
-    icon: '📢',
+    slot: 1,
+    id: 'president',
+    name: 'Aldrin Paul',
+    role: 'President',
+    photo: '/team/president.jpg',
+    hasCustomPhoto: true,
+    bio: 'Leading GWD with a clear conviction: the highest-velocity learning happens when you stop theorizing and start shipping real work.',
+    quote: 'Ideas are worthless until they are built and shipped.',
+    deliverables: ['GWD Club Direction', 'Summit & Showcase Architecture', 'Builder Culture'],
   },
   {
-    step: 2,
-    title: 'Registration',
-    description: 'Registration opens on our platform. We keep forms short and clear. You get a confirmation email with all the details you need.',
-    icon: '📝',
+    slot: 2,
+    id: 'vice-president',
+    name: 'Mohd Ismail',
+    role: 'Vice President',
+    hasCustomPhoto: false,
+    bio: 'Drives operational discipline, sprint roadmaps, and cross-functional alignment across all collective divisions.',
+    quote: 'Execution is the only currency that matters.',
+    deliverables: ['Inter-departmental Execution', 'Operational Roadmaps', 'Sprint Governance'],
   },
   {
-    step: 3,
-    title: 'Selection',
-    description: 'For competitive events, our team reviews applications and selects participants based on transparent criteria shared during announcement.',
-    icon: '✅',
+    slot: 3,
+    id: 'general-secretary',
+    name: 'Shravya',
+    role: 'General Secretary',
+    photo: '/team/general-secretary.jpg',
+    hasCustomPhoto: true,
+    bio: 'Coordinates club administration, member onboarding, internal governance, and transparent documentation.',
+    quote: 'Clarity and operational rigor turn momentum into lasting impact.',
+    deliverables: ['Member Governance', 'Administrative Systems', 'Executive Documentation'],
   },
   {
-    step: 4,
-    title: 'Preparation',
-    description: 'Selected participants receive prep materials, team assignments, and logistics details. We run pre-event briefings for complex events.',
-    icon: '🔧',
+    slot: 4,
+    id: 'technical-lead',
+    name: 'Deekshit Katikaneni',
+    role: 'Technical Lead',
+    photo: '/team/technical-lead.png',
+    hasCustomPhoto: true,
+    bio: 'Architecting digital platforms, open-source systems, and production software. Mentoring technical builders to industry standards.',
+    quote: 'Ship cleanly, architect for scale, and iterate fearlessly.',
+    deliverables: ['Full-Stack Systems', 'Cloud & Architecture', 'GWD Digital Infrastructure'],
   },
   {
-    step: 5,
-    title: 'Event Day',
-    description: 'The day arrives. Our team handles everything from registration desks to technical support so participants can focus on what matters.',
-    icon: '🎯',
+    slot: 5,
+    id: 'creative-lead',
+    name: 'Nishta Gaur',
+    role: 'Creative Lead',
+    hasCustomPhoto: false,
+    bio: 'Directs visual systems, design tokens, brand identities, and editorial storytelling across all touchpoints.',
+    quote: 'Design gives form, intention, and clarity to technology.',
+    deliverables: ['Design Systems', 'Brand Guidelines', 'Interactive Interfaces'],
   },
   {
-    step: 6,
-    title: 'Results',
-    description: 'For competitions, results are announced on event day. For all events, certificates and resources are shared within 48 hours.',
-    icon: '🏆',
+    slot: 6,
+    id: 'marketing-lead',
+    name: 'Anvita Reddy',
+    role: 'Marketing Lead',
+    hasCustomPhoto: false,
+    bio: 'Amplifies GWD launches, builder campaigns, distribution networks, and digital storytelling across channels.',
+    quote: 'Great products deserve distribution that matches their craft.',
+    deliverables: ['Launch Distribution', 'Growth Campaigns', 'Community Reach'],
   },
   {
-    step: 7,
-    title: 'Gallery & Recap',
-    description: 'Photos, videos, and a summary of the event are published on our website and social channels. Memories preserved for everyone.',
-    icon: '📸',
+    slot: 7,
+    id: 'event-management-lead',
+    name: 'Bhavya Koduri',
+    role: 'Event Management Lead',
+    photo: '/team/event-management-lead.jpg',
+    hasCustomPhoto: true,
+    bio: 'Directs hackathons, summits, and campus showcases with seamless stage execution and attendee experience.',
+    quote: 'Every interaction and stage moment shapes the collective memory.',
+    deliverables: ['Hackathon Production', 'Summit Logistics', 'Live Event Operations'],
+  },
+  {
+    slot: 8,
+    id: 'pr-lead',
+    name: 'Tuba Azeem',
+    role: 'PR Lead',
+    hasCustomPhoto: false,
+    bio: 'Directs external relations, institutional liaison, corporate outreach, and media communications.',
+    quote: 'Meaningful partnerships compound when built on mutual trust.',
+    deliverables: ['Corporate Outreach', 'University Liaison', 'Media Communication'],
+  },
+  {
+    slot: 9,
+    id: 'visual-media-lead',
+    name: 'Burhan Uddin',
+    role: 'Visual Media Lead',
+    hasCustomPhoto: false,
+    bio: 'Captures the builder journey through cinematic photography, documentaries, live event recaps, and visual media.',
+    quote: 'Document the struggle and the craft with unvarnished honesty.',
+    deliverables: ['Cinematography', 'Live Photography', 'Documentary Films'],
   },
 ];
 
-// ── Team ──
+// ── Team Hierarchy Export (For /team page) ──
 export interface TeamMember {
   id: string;
   name: string;
@@ -325,6 +517,7 @@ export interface TeamMember {
   quote?: string;
   socials: Record<string, string>;
   projects: string[];
+  hasPhoto?: boolean;
 }
 
 export interface TeamLevel {
@@ -342,295 +535,603 @@ export const TEAM_HIERARCHY: TeamLevel[] = [
         role: 'President',
         bio: 'Leading GWD with a clear conviction: the highest-velocity learning happens when you stop theorizing and start shipping real work.',
         image: '/team/president.jpg',
-        skills: ['Leadership', 'System Architecture', 'Product Strategy', 'Community'],
-        quote: 'The best way to learn is to build something that matters.',
-        socials: { linkedin: '#', twitter: '#', github: '#' },
-        projects: ['campus-connect', 'gwd-summit-2025'],
+        skills: ['Club Leadership', 'Showcase Architecture', 'Builder Culture'],
+        quote: 'Ideas are worthless until they are built and shipped.',
+        socials: { linkedin: '#', twitter: '#' },
+        projects: ['gwd-sports-os', 'global-enterprise-delivery'],
+        hasPhoto: true,
       },
       {
         id: 'vice-president',
-        name: 'Vice President',
+        name: 'Mohd Ismail',
         role: 'Vice President',
-        bio: 'Driving strategy and cross-functional operations to ensure every GWD initiative executes on schedule and with precision.',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
-        skills: ['Operations', 'Strategy', 'Project Management'],
-        quote: 'Execution is everything.',
-        socials: { linkedin: '#', github: '#' },
-        projects: ['green-campus'],
+        bio: 'Drives operational discipline, sprint roadmaps, and cross-functional alignment across all collective divisions.',
+        image: '/team/president.jpg',
+        skills: ['Operations', 'Sprint Governance', 'Execution'],
+        quote: 'Execution is the only currency that matters.',
+        socials: { linkedin: '#' },
+        projects: ['next-bridge-platform'],
+        hasPhoto: false,
       },
     ],
   },
   {
-    level: 'Core Team',
+    level: 'Senior Leads',
     members: [
       {
         id: 'general-secretary',
-        name: 'General Secretary',
+        name: 'Shravya',
         role: 'General Secretary',
-        bio: 'Keeps GWD running smoothly. Coordinates across departments, oversees member administration, and drives documentation.',
+        bio: 'Coordinates club administration, member onboarding, internal governance, and transparent documentation.',
         image: '/team/general-secretary.jpg',
-        skills: ['Communication', 'Operations', 'Administration'],
-        quote: 'Great teams thrive on transparency and clarity.',
+        skills: ['Administration', 'Governance', 'Operations'],
+        quote: 'Clarity and operational rigor turn momentum into lasting impact.',
         socials: { linkedin: '#' },
-        projects: ['gwd-summit-2025'],
+        projects: ['gwd-sports-os'],
+        hasPhoto: true,
       },
       {
         id: 'technical-lead',
-        name: 'Technical Lead',
+        name: 'Deekshit Katikaneni',
         role: 'Technical Lead',
-        bio: 'Architecting the software, platforms, and technical frameworks built by GWD. Mentoring builders and establishing high engineering standards.',
+        bio: 'Architecting digital platforms, open-source systems, and production software. Mentoring technical builders to industry standards.',
         image: '/team/technical-lead.png',
-        skills: ['Full-Stack', 'System Design', 'Cloud', 'Mentoring'],
-        quote: 'Ship cleanly, iterate fearlessly.',
+        skills: ['Full-Stack Systems', 'Sports OS', 'Cloud Architecture'],
+        quote: 'Ship cleanly, architect for scale, and iterate fearlessly.',
         socials: { github: '#', linkedin: '#' },
-        projects: ['campus-connect'],
-      },
-      {
-        id: 'event-management-lead',
-        name: 'Event Management Lead',
-        role: 'Event Management Lead',
-        bio: 'Directing GWD\'s major events, summits, and hackathons with seamless logistics, stage coordination, and memorable experiences.',
-        image: '/team/event-management-lead.jpg',
-        skills: ['Event Management', 'Logistics', 'Stage Production', 'Budgeting'],
-        quote: 'Every detail counts when creating memorable moments.',
-        socials: { linkedin: '#' },
-        projects: ['echo-festival', 'gwd-summit-2025'],
+        projects: ['gwd-sports-os', 'next-bridge-platform'],
+        hasPhoto: true,
       },
       {
         id: 'creative-lead',
-        name: 'Creative Lead',
+        name: 'Nishta Gaur',
         role: 'Creative Lead',
-        bio: 'Directs GWD\'s visual identity, editorial style, motion graphics, and brand experiences across all mediums.',
-        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
-        skills: ['UI/UX', 'Branding', 'Art Direction', 'Motion'],
-        quote: 'Design gives form to purpose.',
-        socials: { linkedin: '#', twitter: '#' },
-        projects: ['echo-festival', 'soundscape'],
+        bio: 'Directs visual systems, design tokens, brand identities, and editorial storytelling across all touchpoints.',
+        image: '/team/president.jpg',
+        skills: ['Design Systems', 'Brand Identity', 'Editorial Design'],
+        quote: 'Design gives form, intention, and clarity to technology.',
+        socials: { linkedin: '#' },
+        projects: ['torqio-automotive'],
+        hasPhoto: false,
       },
     ],
   },
   {
-    level: 'Team Leads',
+    level: 'Divisional Leads',
     members: [
       {
         id: 'marketing-lead',
-        name: 'Marketing Lead',
+        name: 'Anvita Reddy',
         role: 'Marketing Lead',
-        bio: 'Amplifies GWD\'s voice, campaigns, and project launches to the wider university and tech ecosystem.',
-        image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80',
-        skills: ['Growth', 'Social Media', 'Content Strategy', 'Campaigns'],
+        bio: 'Amplifies GWD launches, builder campaigns, distribution networks, and digital storytelling across channels.',
+        image: '/team/president.jpg',
+        skills: ['Launch Distribution', 'Growth Campaigns', 'Storytelling'],
         socials: { instagram: '#', linkedin: '#' },
-        projects: [],
+        projects: ['global-enterprise-delivery'],
+        hasPhoto: false,
+      },
+      {
+        id: 'event-management-lead',
+        name: 'Bhavya Koduri',
+        role: 'Event Management Lead',
+        bio: 'Directs hackathons, summits, and campus showcases with seamless stage execution and attendee experience.',
+        image: '/team/event-management-lead.jpg',
+        skills: ['Event Production', 'Summit Logistics', 'Stage Management'],
+        quote: 'Every interaction and stage moment shapes the collective memory.',
+        socials: { linkedin: '#' },
+        projects: ['gwd-sports-os'],
+        hasPhoto: true,
       },
       {
         id: 'pr-lead',
-        name: 'PR Lead',
-        role: 'PR & Outreach Lead',
-        bio: 'Manages external relations, speaker outreach, university liaison, and industry partnerships.',
-        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80',
-        skills: ['Public Relations', 'Partnerships', 'Outreach'],
-        socials: { twitter: '#', linkedin: '#' },
-        projects: [],
+        name: 'Tuba Azeem',
+        role: 'PR Lead',
+        bio: 'Directs external relations, institutional liaison, corporate outreach, and media communications.',
+        image: '/team/president.jpg',
+        skills: ['Corporate Outreach', 'University Liaison', 'PR'],
+        quote: 'Meaningful partnerships compound when built on mutual trust.',
+        socials: { linkedin: '#' },
+        projects: ['gwd-sports-os'],
+        hasPhoto: false,
       },
       {
-        id: 'media-lead',
-        name: 'Media & Photography Lead',
-        role: 'Media Lead',
-        bio: 'Documents GWD culture and live events through cinematic photography and video recaps.',
-        image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80',
-        skills: ['Cinematography', 'Photography', 'Video Editing'],
+        id: 'visual-media-lead',
+        name: 'Burhan Uddin',
+        role: 'Visual Media Lead',
+        bio: 'Captures the builder journey through cinematic photography, documentaries, live event recaps, and visual media.',
+        image: '/team/president.jpg',
+        skills: ['Cinematography', 'Live Photography', 'Documentary'],
+        quote: 'Document the struggle and the craft with unvarnished honesty.',
         socials: { instagram: '#' },
-        projects: ['soundscape'],
+        projects: ['global-enterprise-delivery'],
+        hasPhoto: false,
       },
     ],
   },
 ];
 
-// ── Collaborations ──
-export const COLLABORATIONS = [
+// ── Founders & Advisory (Slide 18) ──
+export const FOUNDERS = [
   {
-    id: 'techventures',
-    name: 'TechVentures Inc.',
-    type: 'Corporate Sponsor',
-    year: '2024-Present',
-    description: 'TechVentures has been our primary technology partner, providing cloud infrastructure, mentorship, and sponsoring our annual summit.',
-    logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&q=80',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-    outcome: 'Sponsored 3 major events, provided ₹5L in resources',
-    featured: true,
+    name: 'Abdul Mudabbir',
+    role: 'Founder & Club Director',
+    org: 'GWD Club & GWD Global (COO & CMO)',
+    bio: 'Directing GWD ecosystem operations, institutional alliances, and creative strategy.',
+    responsibilities: ['Ecosystem Direction', 'Agency Partnerships', 'Brand Growth'],
   },
   {
-    id: 'creativelab',
-    name: 'Creative Lab Studio',
-    type: 'Creative Partner',
-    year: '2023-Present',
-    description: 'Creative Lab collaborates with us on design workshops and provides professional design tools and licenses to our members.',
-    logo: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=200&q=80',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80',
-    outcome: '4 joint workshops, 50+ students trained',
-    featured: true,
+    name: 'Rahman Pasha',
+    role: 'Founder',
+    org: 'GWD Global (Co-Founder & CEO)',
+    bio: 'Leading enterprise software delivery, commercial agreements, and global client pipelines.',
+    responsibilities: ['Corporate Leadership', 'Commercial Delivery', 'Global Expansion'],
   },
   {
-    id: 'nit-alumni',
-    name: 'NIT Alumni Association',
-    type: 'Institutional Partner',
-    year: '2019-Present',
-    description: 'Our founding partner. The alumni association provides mentorship, funding, and connects current students with industry professionals.',
-    logo: 'https://images.unsplash.com/photo-1523050854058-8df90110c476?w=200&q=80',
-    image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80',
-    outcome: 'Annual mentorship program, career guidance sessions',
-    featured: true,
-  },
-  {
-    id: 'startupincubator',
-    name: 'Launchpad Incubator',
-    type: 'Startup Partner',
-    year: '2024',
-    description: 'Partnered for our entrepreneurship bootcamp, providing workspace, mentors, and seed funding opportunities for student startups.',
-    logo: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=200&q=80',
-    image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80',
-    outcome: '3 student startups incubated',
-    featured: false,
-  },
-  {
-    id: 'designhq',
-    name: 'DesignHQ',
-    type: 'Workshop Partner',
-    year: '2024',
-    description: 'Collaborated on the Design Sprint Weekend, providing professional facilitators and real industry design challenges.',
-    logo: 'https://images.unsplash.com/photo-1614680376408-81e91ced14e6?w=200&q=80',
-    image: 'https://images.unsplash.com/photo-1531498860502-7c67cf02f657?w=800&q=80',
-    outcome: '60 students participated, 12 prototypes built',
-    featured: false,
+    name: 'Moin',
+    role: 'Founder',
+    org: 'GWD Global (Chief Product Officer)',
+    bio: 'Driving product architecture, user research, and technical roadmaps across proprietary ventures.',
+    responsibilities: ['Product Strategy', 'Venture Architecture', 'Engineering Governance'],
   },
 ];
 
-// ── Timeline / Club Journey ──
-export const TIMELINE = [
+// ── GWD Global Pvt Ltd Executive Core (Slide 16) ──
+export const EXECUTIVES = [
+  { name: 'Mohd Abdul Rahman Pasha', role: 'Co-Founder & Chief Executive Officer' },
+  { name: 'Mohammed Abdul Mudabbir', role: 'Co-Founder · Chief Operating Officer & Chief Marketing Officer' },
+  { name: 'Mohammed Moin', role: 'Chief Product Officer' },
+  { name: 'Ashish Goutham', role: 'Chief Technology Officer' },
+  { name: 'Afnan Munwar', role: 'Sales & BD Lead' },
+  { name: 'Oliver Joshua', role: 'Marketing Lead' },
+  { name: 'Akhil', role: 'People & Culture Lead' },
+  { name: 'Deekshit', role: 'Development Lead' },
+  { name: 'Aldrin Paul', role: 'Event Lead' },
+  { name: 'Yuvraj', role: 'Production Lead' },
+];
+
+export const CORE_TEAM_NAMES = EXECUTIVES.map((e) => e.name);
+
+// ── Past & Major Projects (Work Archive) ──
+export interface ProjectItem {
+  id: string;
+  title: string;
+  year: string;
+  category: string;
+  shortDescription: string;
+  description: string;
+  outcome: string;
+  heroImage: string;
+  beforeImage?: string;
+  afterImage?: string;
+  images: string[];
+  tags: string[];
+  collaborators?: string[];
+  partners?: string[];
+  link?: string;
+  featured?: boolean;
+}
+
+export const PROJECTS: ProjectItem[] = [
   {
-    year: '2019',
-    title: 'Founded',
-    description: 'A group of 12 students from different departments came together with a shared vision — to build a space where creativity and technology could thrive together.',
-    image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80',
-    achievement: 'Founding team of 12',
-  },
-  {
-    year: '2020',
-    title: 'First Workshop',
-    description: 'Hosted our first public workshop on web development. 80 students attended. It was chaotic, imperfect, and exactly the energy we needed.',
-    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80',
-    achievement: '80 attendees at first event',
-  },
-  {
-    year: '2021',
-    title: 'First Major Project',
-    description: 'Built a campus event management system used by 15+ clubs. Our first project that had real users and real impact.',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
-    achievement: '15+ clubs adopted the platform',
-  },
-  {
-    year: '2022',
-    title: 'First Industry Collaboration',
-    description: 'Partnered with TechVentures for our first sponsored event. This opened doors to more corporate partnerships and resources.',
-    image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80',
-    achievement: 'First corporate sponsor',
-  },
-  {
-    year: '2023',
-    title: 'Rapid Growth',
-    description: 'Membership grew to 80+. Launched three new verticals: Creative, Content, and Community. The club became a recognized institution on campus.',
-    image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
-    achievement: '80+ active members',
-  },
-  {
-    year: '2024',
-    title: 'Echo Festival',
-    description: 'Our most ambitious event yet — a three-day tech and art festival with 500 attendees, 20 speakers, and national media coverage.',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
-    achievement: '500 attendees, national coverage',
-  },
-  {
+    id: 'gwd-sports-os',
+    title: 'GWD Sports Tournament & Academy OS',
     year: '2025',
-    title: 'Today & Beyond',
-    description: '120+ members strong, 6 active verticals, and a vision to become the most impactful student collective in the country. The journey continues.',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
-    achievement: '120+ members, 6 verticals',
+    category: 'Digital Infrastructure',
+    shortDescription:
+      'The first end-to-end digital simulation and operational platform for grassroots sports in India, powering the Hyderabad Super League.',
+    description:
+      'We are the IT and digital partner behind Hyderabad Super League, Sreenidi Deccan FC, Hyderabad Little Stars, and MasterGrade. Built from scratch by GWD, the system handles player registration, player passports, attendance, fee collection, live standings, and tournament operation across 10 clubs in one unified real-time system.',
+    outcome: '₹1.25L Current MRR · 10 Active Football Clubs · 1 Live League',
+    heroImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1400&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80',
+      'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=800&q=80',
+    ],
+    tags: ['Sports OS', 'Tournament Management', 'Real-Time Standings', 'Next.js & Cloud'],
+    collaborators: ['Hyderabad Super League', 'Sreenidi Deccan FC', 'MasterGrade'],
+    partners: ['Hyderabad Super League', 'Sreenidi Deccan FC', 'MasterGrade'],
+    link: '#',
+    featured: true,
+  },
+  {
+    id: 'next-bridge-platform',
+    title: 'Next Bridge Property Management',
+    year: '2025-2026',
+    category: 'Enterprise Platform',
+    shortDescription:
+      'Comprehensive property management platform unifying facilities, tenant operations, and asset maintenance.',
+    description:
+      'Developed to bridge property managers and enterprise tenants, Next Bridge streamlines billing, work order dispatch, and tenant self-service with real-time operational transparency.',
+    outcome: 'Commercial Launch scheduled for 2026',
+    heroImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1400&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=800&q=80',
+    ],
+    tags: ['Property Tech', 'Enterprise Workflows', 'Tenant Portal'],
+    collaborators: ['Real Estate Partners in Hyderabad & Dubai'],
+    partners: ['Real Estate Partners in Hyderabad & Dubai'],
+    link: '#',
+    featured: true,
+  },
+  {
+    id: 'torqio-automotive',
+    title: 'Torqio Automotive Marketplace',
+    year: '2025',
+    category: 'Digital Marketplace',
+    shortDescription:
+      'Modern digital automotive marketplace engineered for verified vehicle trade, inspections, and enthusiast builds.',
+    description:
+      'Torqio integrates vehicle provenance tracking with digital inspection workflows, creating a trustworthy marketplace for automobile buyers, sellers, and specialized tuners.',
+    outcome: 'In Design · Q3 Target Build',
+    heroImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1400&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&q=80',
+    ],
+    tags: ['Automotive', 'Marketplace', 'Inspection Verification'],
+    collaborators: ['Automotive Networks'],
+    partners: ['Automotive Networks'],
+    link: '#',
+    featured: false,
+  },
+  {
+    id: 'global-enterprise-delivery',
+    title: 'Global Enterprise Engineering Delivery',
+    year: '2024-2025',
+    category: 'Software Engineering',
+    shortDescription:
+      '230+ projects delivered for clients and partners across 10 countries and 3 continents.',
+    description:
+      'GWD engineers and designers have shipped over 230 client deliverables spanning North America, Europe, the Middle East, and Asia. Delivering high-performance interfaces, backend APIs, and design systems for enterprise and growth-stage brands.',
+    outcome: '230+ Projects Delivered · 10 Countries · ₹1.78 Cr Revenue Booked',
+    heroImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1400&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80',
+    ],
+    tags: ['Global Delivery', 'Enterprise Software', 'Design Systems'],
+    collaborators: ['Direct & Intermediary Enterprise Clients'],
+    partners: ['Direct & Intermediary Enterprise Clients'],
+    link: '#',
+    featured: true,
   },
 ];
 
-// ── Gallery ──
-export const GALLERY_IMAGES = [
-  { src: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=80', caption: 'GWD Summit 2024 — Opening Ceremony', category: 'events' },
-  { src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80', caption: 'Team brainstorming for Campus Connect', category: 'projects' },
-  { src: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=900&q=80', caption: 'Club picnic — Spring 2024', category: 'community' },
-  { src: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&q=80', caption: 'Code & Create Hackathon 2024', category: 'events' },
-  { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=900&q=80', caption: 'Workshop on Machine Learning', category: 'workshops' },
-  { src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80', caption: 'Design thinking session', category: 'workshops' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900&q=80', caption: 'Echo Festival closing ceremony', category: 'events' },
-  { src: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&q=80', caption: 'Core team planning retreat', category: 'team' },
-  { src: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=900&q=80', caption: 'Industry collaboration kickoff', category: 'collaborations' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=900&q=80', caption: 'Annual day celebrations', category: 'community' },
-  { src: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=900&q=80', caption: 'Guest lecture by industry expert', category: 'events' },
-  { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&q=80', caption: 'Creative team at work', category: 'projects' },
+// ── Timeline & Milestones (Slide 1: "It started as a student idea") ──
+export interface Milestone {
+  date: string;
+  year: string;
+  title: string;
+  description: string;
+  highlighted?: boolean;
+  achievement: string;
+  image: string;
+}
+
+export const TIMELINE: Milestone[] = [
+  {
+    date: 'Mar 2024',
+    year: '2024',
+    title: 'A student initiative begins',
+    description: 'A freelance collective connecting young talent with paid client work.',
+    achievement: 'Inception at VJIT Campus',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
+  },
+  {
+    date: 'Dec 2024',
+    year: '2024',
+    title: 'Recognised in year one',
+    description: 'Top 500 Upcoming Startups of Asia and Top 25 of India, by E-Cell Bombay.',
+    achievement: 'National Recognition',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
+  },
+  {
+    date: 'Jun 2025',
+    year: '2025',
+    title: 'Officially incorporated',
+    description: 'GWD Global Pvt. Ltd., registered with the MCA on 12 June. Office in Madhapur.',
+    achievement: 'CIN Registered Entity',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
+  },
+  {
+    date: '2025',
+    year: '2025',
+    title: 'GWD Club launches at VJIT',
+    description: "The biggest club inauguration in VJIT's 25-year history.",
+    achievement: '650+ Active Network',
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&q=80',
+  },
+  {
+    date: '2026',
+    year: '2026',
+    title: 'GWD Sports goes live',
+    description: 'Our first product line, and a company now working across 10 countries.',
+    highlighted: true,
+    achievement: 'Hyderabad Super League Live',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80',
+  },
 ];
 
-// ── Navigation ──
-export const NAV_LINKS = [
-  { label: 'Work', href: '/work' },
-  { label: 'Events', href: '/events' },
-  { label: 'Team', href: '/team' },
-  { label: 'About', href: '/about' },
-  { label: 'Join', href: '/join' },
+// ── Events (Separated into Upcoming and Past) ──
+export interface EventItem {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  category: string;
+  venue?: string;
+  registrationOpen?: boolean;
+  registrationStatus?: 'Registration Open' | 'Registration Closed' | 'Registration Full' | 'Registration Not Open';
+  registrationDeadline?: string;
+  status?: 'Published' | 'Draft' | 'Completed' | 'Archived';
+  featured?: boolean;
+  capacity?: number;
+  year?: string;
+  results?: string;
+  highlights?: string[];
+  schedule?: { time: string; title: string; description: string }[];
+  faq?: { question: string; answer: string }[];
+  collaborators?: string[];
+  speakers?: { name: string; role: string; company?: string; avatar?: string; topic?: string }[];
+  gallery?: string[];
+  eligibility?: string;
+  instructions?: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    ogImage?: string;
+  };
+}
+
+export const UPCOMING_EVENTS: EventItem[] = [
+  {
+    id: 'gwd-vjit-builder-sprint-2025',
+    title: 'GWD Builder Sprint & Showcase',
+    date: '2025-11-22',
+    time: '09:30 AM — 05:30 PM IST',
+    location: 'Auditorium, VJIT Campus, Hyderabad',
+    venue: 'VJIT Campus, Hyderabad',
+    shortDescription:
+      'A hands-on builder sprint where student teams build and demo live software, brand prototypes, and creative media.',
+    description:
+      'The premier builder showcase for GWD Club at VJIT. Students collaborate across technology, creative design, marketing, and video media to build real prototypes guided by GWD leads and founders.',
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1400&q=80',
+    registrationOpen: true,
+    featured: true,
+    category: 'Hackathon & Sprint',
+    capacity: 150,
+    schedule: [
+      { time: '09:30', title: 'Check-In & Team Formation', description: 'Briefing, prompt reveal, and mentor assignments' },
+      { time: '10:30', title: 'Sprint Kickoff', description: 'Intensive building across tech, design, and media tracks' },
+      { time: '01:00', title: 'Mid-Sprint Review', description: 'Critique and architecture check with GWD leads' },
+      { time: '04:00', title: 'Final Demos & Ship', description: 'Live 3-minute project demos to judges and audience' },
+      { time: '05:00', title: 'Awards & Onboarding', description: 'Top projects recognized and invited into core GWD tracks' },
+    ],
+    faq: [
+      { question: 'Who can register?', answer: 'Open to all students interested in technology, design, events, or media.' },
+      { question: 'Do I need a team?', answer: 'You can register individually or as a team of up to 4 members.' },
+      { question: 'Is there any fee?', answer: 'No registration fee. Participation is completely free.' },
+    ],
+    collaborators: ['GWD Club VJIT', 'GWD Global'],
+  },
+  {
+    id: 'gwd-sports-demo-day',
+    title: 'GWD Sports League Demo Day',
+    date: '2025-12-10',
+    time: '10:00 AM — 04:00 PM IST',
+    location: 'Hyderabad Super League Arena / Virtual Stream',
+    venue: 'Hyderabad Super League Arena',
+    shortDescription:
+      'Live demonstration of the GWD Sports Tournament Operating System with football club managers and sports tech partners.',
+    description:
+      'Showcasing real-time player passports, automated fixture management, fee processing, and live referee scoring for the 10 Hyderabad football clubs running on GWD infrastructure.',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1400&q=80',
+    registrationOpen: true,
+    featured: false,
+    category: 'Showcase',
+    capacity: 100,
+    schedule: [
+      { time: '10:00', title: 'Keynote: Grassroots Sports OS', description: 'The technology architecture behind GWD Sports' },
+      { time: '11:30', title: 'Live Tournament Simulation', description: 'Real-time player tracking and live standings demo' },
+      { time: '02:00', title: 'Club Manager Roundtable', description: 'Feedback from Hyderabad Super League club directors' },
+    ],
+    faq: [
+      { question: 'Can sport academies participate?', answer: 'Yes, sports directors and club academies can request onboarding demos.' },
+    ],
+    collaborators: ['Hyderabad Super League', 'Sreenidi Deccan FC'],
+  },
 ];
 
-// ── Join / Why Join ──
+export const PAST_EVENTS: EventItem[] = [
+  {
+    id: 'gwd-orientation-2025',
+    title: 'GWD Global Orientation 2025',
+    date: '2025-06-18',
+    time: '10:00 AM — 01:00 PM IST',
+    location: 'Madhapur HQ & Virtual Stream',
+    venue: 'Madhapur, Hyderabad',
+    shortDescription:
+      'Official orientation announcing GWD Global Pvt. Ltd. incorporation, group ventures, and the VJIT club roadmap.',
+    description:
+      'Founders Abdul Mudabbir, Rahman Pasha, and Moin presented the GWD trajectory from a March 2024 student idea to a registered corporation with ₹1.78 Cr revenue, 650+ builders, and 10 countries.',
+    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1400&q=80',
+    category: 'Orientation',
+    year: '2025',
+    results: '200+ attendees · Incorporation unveil · Sports OS rollout',
+    highlights: ['Incorporation announcement', 'Sports OS live demo', 'Top 25 Creative Startups recognition'],
+  },
+  {
+    id: 'hyderabad-super-league-kickoff',
+    title: 'Hyderabad Super League 2025 Kickoff',
+    date: '2025-04-12',
+    time: '04:00 PM — 09:00 PM IST',
+    location: 'Gachibowli Sports Complex, Hyderabad',
+    venue: 'Gachibowli Sports Complex',
+    shortDescription:
+      'Tournament launch powering 10 grassroots football clubs on the GWD Sports management platform.',
+    description:
+      'Launch of India’s first connected grassroots football tournament system. All 10 clubs adopted GWD player passports, digitized registrations, and live automated standings.',
+    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1400&q=80',
+    category: 'Tournament Launch',
+    year: '2025',
+    results: '10 Clubs Onboarded · 250+ Player Passports Created · Zero Paper Scorekeeping',
+    highlights: ['10 clubs live', 'Player digital IDs', 'Real-time standings'],
+  },
+];
+
+// ── Gallery Images (For /gallery page) ──
+export interface GalleryImage {
+  id?: string;
+  src: string;
+  caption: string;
+  category: string;
+  featured?: boolean;
+}
+
+export const GALLERY_IMAGES: GalleryImage[] = [
+  {
+    id: 'gwd-img-conv',
+    src: '/img/visit-conversation.jpg',
+    caption: 'Student builder leads conducting tactical briefing and strategy on the turf',
+    category: 'community',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-match',
+    src: '/img/visit-match.jpg',
+    caption: 'Competitive grassroots football match powered by GWD Sports digital management system',
+    category: 'sports',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-team',
+    src: '/img/visit-team.jpg',
+    caption: 'Cross-functional student collective collaborating under tournament operations canopy',
+    category: 'community',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-train',
+    src: '/img/visit-training.jpg',
+    caption: 'Athlete lineup and squad coordination through verified digital player passports',
+    category: 'sports',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-work',
+    src: '/img/visit-workstation.jpg',
+    caption: 'Live event operations desk running real-time tournament scoring and field telemetry',
+    category: 'projects',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-bts',
+    src: '/img/visit-behind-scenes.jpg',
+    caption: 'Field infrastructure, sound engineering, and ground logistics deployed by GWD leads',
+    category: 'events',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-vjit',
+    src: '/img/img2.jpg',
+    caption: 'Landmark GWD Club inauguration and student assembly at VJIT Campus',
+    category: 'events',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-sprint',
+    src: '/img/img3.jpg',
+    caption: 'Intensive builder sprint and prototype testing session with student teams',
+    category: 'projects',
+    featured: false,
+  },
+  {
+    id: 'gwd-img-demo',
+    src: '/img/img4.jpg',
+    caption: 'Product showcase and live system demonstration at campus auditorium',
+    category: 'events',
+    featured: false,
+  },
+  {
+    id: 'gwd-img-vjit-official',
+    src: '/img/vjit-inauguration.jpg',
+    caption: '🌟 Successful Inauguration of GWD Club — Empowering Future Freelancers & Entrepreneurs at VJIT!',
+    category: 'events',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-community-banner',
+    src: '/img/gwd-community-banner.jpeg',
+    caption: 'GWD Club student builder community and orientation assembly',
+    category: 'community',
+    featured: true,
+  },
+  {
+    id: 'gwd-img-leads',
+    src: '/img/img1.jpg',
+    caption: 'GWD student leadership team and department directors',
+    category: 'community',
+    featured: false,
+  },
+];
+
+// ── Why Join & FAQ (For /join page) ──
 export const WHY_JOIN = [
   {
-    title: 'Build Real Projects',
-    description: 'Work on projects that have real users and real impact — not just academic exercises.',
+    title: 'Ship Real Production Work',
+    description: 'We don’t do simulated coursework. You will build and deploy platforms, brand systems, and live operations that real clients and thousands of users depend on.',
   },
   {
-    title: 'Learn from Peers',
-    description: 'Learn skills that aren\'t taught in classrooms — from design thinking to leadership to technical architecture.',
+    title: 'Cross-Disciplinary Velocity',
+    description: 'Work alongside software architects, visual designers, event directors, and cinematographers in tight, synchronized build cycles.',
   },
   {
-    title: 'Network & Grow',
-    description: 'Connect with industry professionals, alumni, and a community of like-minded creators.',
+    title: 'Global Delivery Network',
+    description: 'Connect into GWD’s 650+ builder network operating across 10 countries spanning North America, Europe, the Middle East, and Asia.',
   },
   {
-    title: 'Lead & Mentor',
-    description: 'Take ownership of projects and teams. Develop leadership skills by leading, not just following.',
-  },
-  {
-    title: 'Create Memories',
-    description: 'Some of the best college memories come from working on something you care about with people you respect.',
-  },
-  {
-    title: 'Stand Out',
-    description: 'A portfolio of real work, event experience, and leadership roles that set you apart in any application.',
+    title: 'Clear Leadership & Mentorship',
+    description: 'Direct mentorship from founders and lead builders who navigated the journey from a March 2024 campus idea to an incorporated enterprise.',
   },
 ];
 
-// ── FAQ ──
 export const JOIN_FAQ = [
   {
-    question: 'Who can join GWD?',
-    answer: 'Any currently enrolled student at NIT, regardless of department or year, can apply to join GWD.',
-  },
-  {
-    question: 'When do you recruit new members?',
-    answer: 'We hold two recruitment drives each year — at the start of each semester. Follow our socials for announcements.',
-  },
-  {
-    question: 'What\'s the selection process?',
-    answer: 'We look for passion and willingness to contribute, not just technical skills. The process includes a short application form, a creative task, and an informal conversation.',
-  },
-  {
-    question: 'How much time commitment is expected?',
-    answer: 'We expect members to contribute 5-8 hours per week. This includes meetings, project work, and event preparation.',
+    question: 'Who is eligible to join GWD Club?',
+    answer: 'Students from any department or year at VJIT and affiliated institutions who are dedicated to shipping real work in technology, design, events, marketing, PR, or media.',
   },
   {
     question: 'Do I need prior experience?',
-    answer: 'No. We value curiosity and willingness to learn over existing skills. Many of our best members started with zero experience.',
+    answer: 'We value hunger, curiosity, and consistency over extensive resumes. If you show up, take feedback, and iterate fearlessly, you will thrive here.',
   },
+  {
+    question: 'What is the commitment expectation?',
+    answer: 'Expect dedicated sprint hours per week depending on active initiatives, project deliverables, or upcoming event timelines.',
+  },
+  {
+    question: 'How does the application process work?',
+    answer: 'Submit the application form below. Our divisional leads review answers weekly, followed by a short conversation and practical trial sprint.',
+  },
+];
+
+// ── Application Disciplines for /join ──
+export const JOIN_DISCIPLINES = [
+  { id: 'tech', label: 'Technology', desc: 'Full-stack software, mobile apps, DevOps, sports infrastructure' },
+  { id: 'design', label: 'Design & Visuals', desc: 'UI/UX interfaces, design systems, editorial layouts, 3D' },
+  { id: 'events', label: 'Event Management', desc: 'Hackathon production, summit coordination, campus logistics' },
+  { id: 'marketing', label: 'Marketing & Growth', desc: 'Campaign distribution, social growth, builder storytelling' },
+  { id: 'pr', label: 'Public Relations', desc: 'Corporate partnerships, university liaison, outreach' },
+  { id: 'media', label: 'Visual Media', desc: 'Cinematography, documentary filming, live photography, editing' },
 ];

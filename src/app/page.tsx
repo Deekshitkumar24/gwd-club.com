@@ -1,15 +1,30 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useReveal, useCountUp, useParallax } from '@/hooks/useAnimations';
-import { STATS, ACTIVITIES, PROJECTS, UPCOMING_EVENTS, EVENT_WORKFLOW, COLLABORATIONS, TIMELINE, GALLERY_IMAGES } from '@/data/content';
-import Leadership from '@/components/Leadership/Leadership';
-import ImageFanCarousel from '@/components/ImageFanCarousel/ImageFanCarousel';
+import { useReveal, useCountUp } from '@/hooks/useAnimations';
+import { useCms } from '@/context/CmsContext';
+import {
+  CLUB,
+  STATS,
+  DISCIPLINES,
+  UPCOMING_EVENTS,
+  NINE_LEADERS,
+  PROJECTS,
+  COLLABORATIONS,
+  CLIENT_DISCLAIMER,
+  THREE_ARMS,
+} from '@/data/content';
+import { DyeAtmosphereTransition, DyeContainedCard, DyeCtaBackdrop } from '@/components/DyeVisual';
+import { GwdClientScroller, EcosystemScroller } from '@/components/ui/brand-scoller';
+import GlobalPresence from '@/components/GlobalPresence/GlobalPresence';
+import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './page.module.css';
 
-/* ── Stat Counter ── */
-function StatCounter({ label, value, suffix }: { label: string; value: number; suffix: string }) {
+type HeroState = 'loading' | 'playing' | 'transitioning' | 'revealed';
+
+/* ── Stat Counter Component ── */
+function StatItem({ label, value, suffix, prefix = '' }: { label: string; value: number; suffix: string; prefix?: string }) {
   const { ref, isVisible } = useReveal(0.3);
   const { count, start } = useCountUp(value, 1800);
 
@@ -19,422 +34,1028 @@ function StatCounter({ label, value, suffix }: { label: string; value: number; s
 
   return (
     <div ref={ref} className={styles.statItem}>
-      <div className={styles.statValue}>{count}{suffix}</div>
+      <div className={styles.statValue}>
+        {prefix}{count}<span className={styles.statSuffix}>{suffix}</span>
+      </div>
       <div className={styles.statLabel}>{label}</div>
     </div>
   );
 }
 
 export default function HomePage() {
-  const [activeActivity, setActiveActivity] = useState(0);
-  const [activeWorkflow, setActiveWorkflow] = useState(0);
+  const { store } = useCms();
+
+  const heroCms = store.homepage.hero;
+  const introCms = store.homepage.intro;
+  const finalCtaCms = store.homepage.finalCta;
+  const statsCms = store.homepage.stats || STATS;
+  const domainsList = store.domains;
+
+  const [heroState, setHeroState] = useState<HeroState>('loading');
+  const [videoProgress, setVideoProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [activeDiscipline, setActiveDiscipline] = useState(0);
+
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const modalVideoRef = useRef<HTMLVideoElement>(null);
+  const watchFilmBtnRef = useRef<HTMLButtonElement>(null);
+  const closeModalBtnRef = useRef<HTMLButtonElement>(null);
+  const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const failsafeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const aboutReveal = useReveal();
-  const activitiesReveal = useReveal();
-  const projectsReveal = useReveal();
+  // Section reveals
+  const introReveal = useReveal();
+  const threeArmsReveal = useReveal();
+  const studentIdeaReveal = useReveal();
+  const whatWeDoReveal = useReveal();
+  const workReveal = useReveal();
   const eventReveal = useReveal();
-  const workflowReveal = useReveal();
+  const leaderReveal = useReveal();
   const collabReveal = useReveal();
-  const timelineReveal = useReveal();
+  const statsReveal = useReveal();
   const ctaReveal = useReveal();
-  const galleryReveal = useReveal();
 
-  const heroParallax = useParallax(0.15);
-  const featuredEvent = UPCOMING_EVENTS.find(e => e.featured) || UPCOMING_EVENTS[0];
+  const featuredEvent =
+    store.upcomingEvents.find((e) => e.id === store.homepage.featuredEventId) ||
+    store.upcomingEvents.find((e) => e.featured) ||
+    store.upcomingEvents[0] ||
+    UPCOMING_EVENTS[0];
 
-  // Guarantee autoplay on mount
-  useEffect(() => {
-    const vid = heroVideoRef.current;
-    if (vid) {
-      vid.muted = isMuted;
-      vid.play().catch(err => {
-        console.warn('Hero video autoplay notice:', err);
-      });
+  const president =
+    store.leaders.find((l) => l.id === store.homepage.leadershipHighlightId) ||
+    store.leaders[0] ||
+    NINE_LEADERS[0];
+
+  const featuredProjects = (
+    store.projects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured).length > 0
+      ? store.projects.filter((p) => store.homepage.featuredProjectIds?.includes(p.id) || p.featured)
+      : store.projects
+  ).slice(0, 3);
+
+  const featuredCollab =
+    store.collaborations.find((c) => c.id === store.homepage.featuredCollaborationId) ||
+    store.collaborations[0] ||
+    COLLABORATIONS[0];
+
+  // ── Scroll lock / unlock helpers ──
+  const unlockScroll = useCallback(() => {
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }, []);
+
+  const lockScroll = useCallback(() => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }, []);
+
+  // ── Transition to revealed state ──
+  const transitionToRevealed = useCallback((autoScrollToJoin = false) => {
+    if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+    if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
+
+    // Save that the intro has been played once in this session
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('gwd_hero_intro_seen', 'true');
+      } catch {
+        /* noop */
+      }
     }
-  }, [isMuted]);
 
-  const toggleSound = () => {
-    const vid = heroVideoRef.current;
-    if (!vid) return;
-    const nextMuted = !isMuted;
-    vid.muted = nextMuted;
-    setIsMuted(nextMuted);
-    if (!nextMuted) {
-      vid.play().catch(() => {});
+    setHeroState('transitioning');
+    unlockScroll();
+
+    if (heroVideoRef.current) {
+      heroVideoRef.current.pause();
+      heroVideoRef.current.loop = false;
+    }
+    setIsMuted(true);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gwd:hero-revealed'));
+    }
+
+    setTimeout(() => {
+      setHeroState('revealed');
+      if (autoScrollToJoin) {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }, 450);
+  }, [unlockScroll]);
+
+  // ── Video handlers ──
+  const handleCanPlay = useCallback(() => {
+    if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+
+    const video = heroVideoRef.current;
+    if (!video) {
+      transitionToRevealed(false);
+      return;
+    }
+
+    setHeroState('playing');
+    lockScroll();
+    video.muted = isMuted;
+    video.playsInline = true;
+    video.loop = false; // Intro film plays ONCE from start to finish
+
+    video
+      .play()
+      .then(() => {
+        const durationMs =
+          video.duration && !isNaN(video.duration) ? video.duration * 1000 + 1000 : 50000;
+        failsafeTimeoutRef.current = setTimeout(() => transitionToRevealed(true), durationMs);
+      })
+      .catch(() => {
+        transitionToRevealed(false);
+      });
+  }, [isMuted, lockScroll, transitionToRevealed]);
+
+  // ── Initial hero check on mount ──
+  useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData =
+      typeof navigator !== 'undefined' &&
+      (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    const alreadySeen =
+      typeof window !== 'undefined' && sessionStorage.getItem('gwd_hero_intro_seen') === 'true';
+
+    // If user already watched intro in this session, or prefers reduced motion, skip straight to content!
+    if (alreadySeen || prefersReducedMotion || saveData) {
+      setHeroState('revealed');
+      unlockScroll();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('gwd:hero-revealed'));
+      }
+      return;
+    }
+
+    setHeroState('loading');
+
+    // Attempt immediate playback if video is already ready in cache
+    const video = heroVideoRef.current;
+    if (video) {
+      video.muted = true;
+      video.playsInline = true;
+      video.loop = false;
+      if (video.readyState >= 2) {
+        handleCanPlay();
+      }
+    }
+
+    // 8s fallback load timeout
+    loadTimeoutRef.current = setTimeout(() => {
+      transitionToRevealed(false);
+    }, 8000);
+
+    return () => {
+      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+      if (failsafeTimeoutRef.current) clearTimeout(failsafeTimeoutRef.current);
+      unlockScroll();
+    };
+  }, [handleCanPlay, transitionToRevealed, unlockScroll]);
+
+  const handleTimeUpdate = () => {
+    const video = heroVideoRef.current;
+    if (video && video.duration) setVideoProgress(video.currentTime / video.duration);
+  };
+
+  const handleVideoEnded = () => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.pause();
+      heroVideoRef.current.loop = false;
+    }
+    transitionToRevealed(true);
+  };
+
+  const handleSkipIntro = () => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.pause();
+      heroVideoRef.current.loop = false;
+    }
+    transitionToRevealed(true);
+  };
+
+  const handleToggleSound = () => {
+    if (heroVideoRef.current) {
+      const nextMuted = !heroVideoRef.current.muted;
+      heroVideoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
     }
   };
 
-  // Workflow scroll logic
-  const workflowRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!workflowRef.current) return;
-      const rect = workflowRef.current.getBoundingClientRect();
-      const progress = 1 - (rect.top / window.innerHeight);
-      const stepIndex = Math.floor(progress * EVENT_WORKFLOW.length * 0.8);
-      setActiveWorkflow(Math.max(0, Math.min(stepIndex, EVENT_WORKFLOW.length - 1)));
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  const handleVideoError = () => transitionToRevealed(false);
+
+  // ── Watch Film modal handlers ──
+  const openWatchFilmModal = () => setShowVideoModal(true);
+
+  const closeWatchFilmModal = useCallback(() => {
+    setShowVideoModal(false);
+    watchFilmBtnRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showVideoModal) closeWatchFilmModal();
+    };
+    if (showVideoModal) {
+      window.addEventListener('keydown', handleKeyDown);
+      setTimeout(() => closeModalBtnRef.current?.focus(), 50);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showVideoModal, closeWatchFilmModal]);
+
+  const isIntroPlaying = heroState === 'loading' || heroState === 'playing';
 
   return (
     <div className={styles.page}>
-      {/* ══════════ 01. HERO ══════════ */}
-      <section className={styles.hero} id="hero">
-        <div className={styles.heroBg} ref={heroParallax.ref}>
-          <video
-            ref={heroVideoRef}
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-            preload="auto"
-            style={{ transform: `translateY(${heroParallax.offset}px) scale(1.08)` }}
-          >
-            <source src="/gwd-hero.mp4" type="video/mp4" />
-          </video>
-          <div className={styles.heroBgOverlay} />
-        </div>
-
-        <div className={styles.heroContent}>
-          <p className={styles.heroLabel}>A Student Collective</p>
-          <h1 className={styles.heroTitle}>
-            <span className={styles.heroTitleRed}>GET WORK</span> DONE.
-          </h1>
-          <p className={styles.heroSubtitle}>
-            A student collective that turns ideas into shipped work — tech, design, and everything between.
-          </p>
-          <div className={styles.heroCtas}>
-            <Link href="/join" className="btn btn-primary btn-lg">Join GWD</Link>
-            <Link href="/work" className="btn btn-secondary btn-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'white' }}>Explore Work</Link>
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 1: HERO FILM (Full Viewport First Impression)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section
+        className={`${styles.filmSection} ${heroState === 'revealed' ? styles.filmSettled : ''}`}
+        aria-label="Opening Film"
+        data-dye-section="hero"
+      >
+        {/* Intro controls: Sound on/off & Skip intro */}
+        {isIntroPlaying && (
+          <div className={styles.introControls}>
             <button
               type="button"
-              onClick={() => setShowVideoModal(true)}
-              className="btn btn-secondary btn-lg"
-              style={{ borderColor: 'rgba(255,255,255,0.4)', color: 'white' }}
+              className={styles.soundToggleBtn}
+              onClick={handleToggleSound}
+              aria-label={isMuted ? 'Turn sound on' : 'Mute sound'}
+              tabIndex={0}
             >
-              ▶ Watch Film
+              {isMuted ? (
+                <>
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+                  </svg>
+                  <span>Sound on</span>
+                </>
+              ) : (
+                <>
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                  </svg>
+                  <span>Mute</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={styles.skipIntroBtn}
+              onClick={handleSkipIntro}
+              aria-label="Skip introduction film"
+              tabIndex={0}
+            >
+              <span>Skip intro</span>
+              <span className={styles.skipArrow}>→</span>
             </button>
           </div>
-        </div>
+        )}
 
-        {/* Audio Toggle Button */}
-        <button
-          type="button"
-          onClick={toggleSound}
-          className={styles.soundToggle}
-          aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-        >
-          {isMuted ? "🔇 Unmute Audio" : "🔊 Audio On"}
-        </button>
+        {/* Minimal dark loading screen with centered GWD logo */}
+        {heroState === 'loading' && (
+          <div className={styles.loadingScreen}>
+            <div className={styles.loadingLogoWrap}>
+              <img
+                src="/brand/gwd-logo.png"
+                alt="GWD"
+                className={styles.loadingLogo}
+              />
+              <span className={styles.loadingPulseDot} />
+            </div>
+          </div>
+        )}
 
-        <div className={styles.heroScroll}>
-          <span className={styles.heroScrollLabel}>Scroll</span>
-          <span className={styles.heroScrollLine} />
+        {/* Cinematic Video Background */}
+        <div className={styles.filmContainer}>
+          <video
+            ref={heroVideoRef}
+            className={styles.filmVideo}
+            muted={isMuted}
+            autoPlay
+            playsInline
+            preload="auto"
+            onCanPlay={handleCanPlay}
+            onLoadedData={handleCanPlay}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnded}
+            onError={handleVideoError}
+          >
+            <source src={heroCms.videoUrl || '/gwd-hero.mp4'} type="video/mp4" />
+            <source src={heroCms.fallbackVideoUrl || '/new-era-hero.mp4'} type="video/mp4" />
+          </video>
+
+          <div
+            className={`${styles.filmScrim} ${heroState === 'revealed' || heroState === 'transitioning' ? styles.scrimActive : ''}`}
+            aria-hidden="true"
+          />
+
+          {heroState === 'playing' && (
+            <div
+              className={styles.filmProgressBar}
+              style={{ width: `${Math.min(100, Math.max(0, videoProgress * 100))}%` }}
+              aria-hidden="true"
+            />
+          )}
         </div>
       </section>
 
-      {/* Fullscreen Video Modal */}
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 2: GWD INTRODUCTION — HERO REVEAL
+          ═══════════════════════════════════════════════════════════════ */}
+      <section
+        className={`${styles.heroRevealSection} ${heroState === 'revealed' ? styles.revealedVisible : ''}`}
+        id="main-content"
+        ref={introReveal.ref}
+        data-dye-section="intro"
+      >
+        <div className="container">
+          <div className={`${styles.heroSplitGrid} reveal ${introReveal.isVisible || heroState === 'revealed' ? 'visible' : ''}`}>
+            {/* Left Column: Strong Headline & CTAs from CMS */}
+            <div className={styles.heroTextCol}>
+              <div className={styles.eyebrowChip}>
+                <span className={styles.redDot} />
+                <span className={styles.eyebrowText}>{heroCms.badge || 'GWD / GET WORK DONE'}</span>
+              </div>
+
+              <h1 className={styles.mainTitle}>
+                <span className={styles.redHighlight}>GET WORK</span>
+                <br />
+                DONE.
+              </h1>
+
+              <p className={styles.mainSubtitle}>
+                {heroCms.subheadline || 'A student collective that turns ideas into shipped work — tech, design, and everything between.'}
+              </p>
+
+              <div className={styles.heroActionGroup}>
+                <Link href={heroCms.primaryCtaHref || '/explore'} className={styles.btnPrimary}>
+                  {heroCms.primaryCtaText || 'Explore Domains'}
+                </Link>
+                <Link href="/work" className={styles.btnSecondary}>
+                  Explore Work
+                </Link>
+                <button
+                  ref={watchFilmBtnRef}
+                  type="button"
+                  onClick={openWatchFilmModal}
+                  className={styles.btnWatchFilm}
+                  aria-label="Watch intro film in modal"
+                >
+                  <svg className={styles.playIcon} viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span>{heroCms.secondaryCtaText || 'Watch Film'}</span>
+                </button>
+              </div>
+
+              {/* Connecting Accent Indicator */}
+              <div className={styles.heroConnectingAccent}>
+                <span className={styles.accentLabel}>{introCms.label || '01 · OVERVIEW'}</span>
+                <span className={styles.accentLine} />
+              </div>
+            </div>
+
+            {/* Right Column: Builder Activity Visual */}
+            <div className={styles.heroVisualCol}>
+              <div className={styles.heroFrame}>
+                <img
+                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1400&q=80"
+                  alt="GWD Builders collaborating on production systems"
+                  className={styles.heroPhoto}
+                  loading="eager"
+                />
+                <div className={styles.heroBadgeOverlay}>
+                  <span className={styles.badgeText}>GWD GLOBAL &middot; INCORPORATED JUNE 2025</span>
+                  <span className={styles.badgeSub}>Madhapur HQ &middot; VJIT Campus</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 2.5A: ONE COMPANY. THREE ARMS. (Slide 1)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.threeArmsSection} ref={threeArmsReveal.ref} data-dye-section="intro">
+        <div className="container">
+          <div className={`reveal ${threeArmsReveal.isVisible ? 'visible' : ''}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>• The company</span>
+              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                MCA Registered 2025 · Hyderabad HQ
+              </span>
+            </div>
+            <h2 className={styles.sectionHeadingLarge} style={{ color: '#FFFFFF' }}>{introCms.threeArmsTitle || CLUB.companyHeadline}</h2>
+            <p className={styles.sectionHeadingSub} style={{ color: 'rgba(255, 255, 255, 0.75)', maxWidth: '780px' }}>
+              {introCms.threeArmsSub || CLUB.companySubheadline}
+            </p>
+
+            <div className={styles.threeArmsGrid}>
+              {THREE_ARMS.map((arm) => (
+                <div
+                  key={arm.id}
+                  className={`${styles.armCard} ${arm.highlighted ? styles.armCardHighlighted : ''}`}
+                >
+                  <div>
+                    <h3 className={styles.armTitle}>{arm.name}</h3>
+                    <span className={styles.armSubtitle}>{arm.subtitle}</span>
+                    <p className={styles.armDesc}>{arm.description}</p>
+                  </div>
+
+                  <div className={styles.armFooter}>
+                    {arm.tag && <span className={styles.armTag}>{arm.tag}</span>}
+                    {arm.badge && (
+                      <span className={styles.armBadge}>
+                        {arm.badge.statusDot && <span className={styles.armStatusDot} />}
+                        {arm.badge.text}
+                      </span>
+                    )}
+                    {arm.metrics && (
+                      <div className={styles.armMetrics}>
+                        {arm.metrics.map((m, i) => (
+                          <div key={i} className={styles.armMetricItem}>
+                            <span className={styles.armMetricVal}>{m.value}</span>
+                            <span className={styles.armMetricLbl}>{m.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 2.5B: IT STARTED AS A STUDENT IDEA (Slide 1)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.studentIdeaSection} ref={studentIdeaReveal.ref} data-dye-section="intro">
+        <div className="container">
+          <div className={`reveal ${studentIdeaReveal.isVisible ? 'visible' : ''}`}>
+            <span className="label" style={{ color: 'var(--brand-red)' }}>• How it began</span>
+            <div className={styles.studentIdeaGrid}>
+              <div>
+                <h2 className={styles.studentIdeaTitle}>{introCms.studentIdeaTitle || CLUB.studentIdeaHeadline}</h2>
+                <p className={styles.studentIdeaBody}>
+                  {introCms.studentIdeaBody || CLUB.studentIdeaStory}
+                </p>
+              </div>
+              <div className={styles.studentIdeaRight}>
+                <div className={styles.studentIdeaBox}>
+                  <p className={styles.studentIdeaBoxTitle}>&ldquo;{CLUB.motto}&rdquo;</p>
+                  <p className={styles.studentIdeaBoxSub}>The name never changed, because the mission never did.</p>
+                  <div style={{ marginTop: 'var(--space-md)' }}>
+                    <span className={styles.accoladeChip}>Top 500 Startups of Asia · E-Cell Bombay</span>
+                    <span className={styles.accoladeChip}>Top 25 of India · E-Cell Bombay</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Milestones Horizontal Row */}
+            <div className={styles.milestonesTrack}>
+              {store.timeline.slice(0, 4).map((m) => (
+                <div
+                  key={m.title}
+                  className={`${styles.milestoneCard} ${m.highlighted ? styles.milestoneCardActive : ''}`}
+                >
+                  <div className={styles.milestoneDate}>{m.date}</div>
+                  <h3 className={styles.milestoneTitle}>{m.title}</h3>
+                  <p className={styles.milestoneDesc}>{m.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 3: WHAT GWD DOES (Core Domains & Capabilities)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.whatWeDoSection} ref={whatWeDoReveal.ref} data-dye-section="whatwedo">
+        <div className="container">
+          <div className={`${styles.sectionHeader} reveal ${whatWeDoReveal.isVisible ? 'visible' : ''}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <span className="label" style={{ color: 'var(--brand-red)' }}>02 · Capabilities & Domains</span>
+                <h2 className={styles.sectionHeadingLarge}>What We Do</h2>
+                <p className={styles.sectionHeadingSub}>
+                  Specialized organizational domains operating with synchronized execution — from systems architecture to live production.
+                </p>
+              </div>
+              <Link href="/explore" className={styles.viewAllWorkLink}>
+                <span>Explore all {domainsList.length} domains</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.disciplinesInteractive}>
+            <div className={styles.disciplinesList}>
+              {domainsList.slice(0, 4).map((domain, index) => {
+                const isActive = activeDiscipline === index;
+                return (
+                  <div
+                    key={domain.id}
+                    className={`${styles.disciplineRow} ${isActive ? styles.disciplineRowActive : ''}`}
+                    onClick={() => setActiveDiscipline(index)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveDiscipline(index)}
+                    aria-label={`View details for ${domain.name}`}
+                  >
+                    <div className={styles.rowMain}>
+                      <span className={styles.rowIndex}>0{index + 1}</span>
+                      <h3 className={styles.rowTitle}>{domain.name}</h3>
+                    </div>
+                    <p className={styles.rowDesc}>{domain.shortDesc}</p>
+                    <div className={styles.tagPills}>
+                      {domain.deliverables.slice(0, 3).map((tag) => (
+                        <span key={tag} className={styles.tagPill}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Discipline Deliverable Showcase */}
+            <div className={styles.disciplinePreviewCol}>
+              {domainsList[activeDiscipline] && (
+                <div className={styles.previewCard}>
+                  <div className={styles.previewImageWrap}>
+                    <img
+                      src={domainsList[activeDiscipline].leadPhoto || '/team/president.jpg'}
+                      alt={domainsList[activeDiscipline].name}
+                      className={styles.previewImage}
+                    />
+                    <div className={styles.previewOverlay}>
+                      <span className={styles.previewIndex}>0{activeDiscipline + 1}</span>
+                      <span className={styles.previewCategory}>DOMAIN FOCUS · {domainsList[activeDiscipline].code}</span>
+                    </div>
+                  </div>
+                  <div className={styles.previewInfo}>
+                    <span className={styles.previewLabel}>LEAD & DELIVERABLES</span>
+                    <p style={{ fontWeight: 600, color: '#121212', marginBottom: '0.25rem' }}>
+                      Lead: {domainsList[activeDiscipline].leadName} ({domainsList[activeDiscipline].leadRole})
+                    </p>
+                    <p className={styles.previewDeliverables}>{domainsList[activeDiscipline].fullDesc}</p>
+                    <div style={{ marginTop: '1.25rem' }}>
+                      <Link href="/explore" className={styles.projectActionLink}>
+                        Explore Domain members & work →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Atmospheric Fluid Chapter Transition ── */}
+      <DyeAtmosphereTransition
+        chapter="03 · ARCHITECTURE & SHIPPED SYSTEMS"
+        title="Execution velocity across live production environments"
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 4: SELECTED WORK (Things We Actually Built)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.featuredWorkSection} ref={workReveal.ref} data-dye-section="work">
+        <div className="container">
+          <div className={styles.workHeaderRow}>
+            <div className={styles.sectionHeader} style={{ marginBottom: 0 }}>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>03 · Shipped Deliverables</span>
+              <h2 className={styles.sectionHeadingLarge}>Work That Ships</h2>
+              <p className={styles.sectionHeadingSub}>
+                Production platforms, enterprise systems, and digital infrastructure built and delivered by the GWD collective.
+              </p>
+            </div>
+            <Link href="/work" className={styles.viewAllWorkLink}>
+              <span>View all work</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          <div className={styles.workAsymmetricGrid}>
+            {/* Dominant Featured Project */}
+            {featuredProjects[0] && (
+              <div className={styles.dominantProjectCard} style={{ position: 'relative', overflow: 'hidden' }}>
+                <BorderBeam size={360} duration={12} colorFrom="#C41E1E" colorTo="#EF4444" borderWidth={2} />
+                <Link href={`/work/${featuredProjects[0].id}`} className={styles.dominantMediaWrap}>
+                  <img
+                    src={featuredProjects[0].heroImage}
+                    alt={featuredProjects[0].title}
+                    className={styles.dominantCoverImage}
+                  />
+                  <div className={styles.mediaOverlayGradient} />
+                  <span className={styles.projectCategoryBadge}>{featuredProjects[0].category}</span>
+                  <span className={styles.dominantYearBadge}>{featuredProjects[0].year}</span>
+                </Link>
+                <div className={styles.dominantDetails}>
+                  {featuredProjects[0].outcome && (
+                    <div className={styles.outcomePillRow}>
+                      <span className={styles.outcomePill}>
+                        <span className={styles.outcomePulseDot} />
+                        <span className={styles.outcomePillText}>{featuredProjects[0].outcome}</span>
+                      </span>
+                    </div>
+                  )}
+                  <Link href={`/work/${featuredProjects[0].id}`} className={styles.dominantTitleLink}>
+                    <h3 className={styles.dominantTitle}>{featuredProjects[0].title}</h3>
+                  </Link>
+                  <p className={styles.dominantDesc}>{featuredProjects[0].shortDescription}</p>
+                  <div className={styles.dominantFooter}>
+                    <div className={styles.collaboratorChips}>
+                      {featuredProjects[0].tags.slice(0, 4).map((tag) => (
+                        <span key={tag} className={styles.collaboratorChip}>{tag}</span>
+                      ))}
+                    </div>
+                    <Link href={`/work/${featuredProjects[0].id}`} className={styles.projectActionLink}>
+                      <span>Read Full Case Study</span>
+                      <span className={styles.arrowGlyph}>→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Supporting Projects Grid */}
+            <div className={styles.supportingProjectsGrid}>
+              {featuredProjects.slice(1, 3).map((project) => (
+                <div key={project.id} className={styles.supportingProjectCard} style={{ position: 'relative', overflow: 'hidden' }}>
+                  <BorderBeam size={240} duration={14} colorFrom="#E11D48" colorTo="#F59E0B" borderWidth={1.5} />
+                  <Link href={`/work/${project.id}`} className={styles.supportingMediaWrap}>
+                    <img
+                      src={project.heroImage}
+                      alt={project.title}
+                      className={styles.supportingCoverImage}
+                    />
+                    <div className={styles.mediaOverlayGradient} />
+                    <span className={styles.supportingCategoryBadge}>{project.category}</span>
+                    <span className={styles.supportingYearBadge}>{project.year}</span>
+                  </Link>
+                  <div className={styles.supportingDetails}>
+                    {project.outcome && (
+                      <div className={styles.outcomePillRow}>
+                        <span className={styles.outcomePill}>
+                          <span className={styles.outcomePulseDot} />
+                          <span className={styles.outcomePillText}>{project.outcome}</span>
+                        </span>
+                      </div>
+                    )}
+                    <Link href={`/work/${project.id}`} className={styles.supportingTitleLink}>
+                      <h3 className={styles.supportingTitle}>{project.title}</h3>
+                    </Link>
+                    <p className={styles.supportingDesc}>{project.shortDescription}</p>
+                    <div className={styles.supportingFooter}>
+                      <div className={styles.supportingTags}>
+                        {project.tags.slice(0, 3).map((tag) => (
+                          <span key={tag} className={styles.supportingTagChip}>{tag}</span>
+                        ))}
+                      </div>
+                      <Link href={`/work/${project.id}`} className={styles.supportingLink}>
+                        <span>Case study</span>
+                        <span className={styles.arrowGlyph}>→</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 5: FEATURED EVENT SHOWCASE
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.eventShowcaseSection} ref={eventReveal.ref} data-dye-section="events">
+        <div className="container">
+          <div className={styles.eventHeaderRow}>
+            <div className={styles.sectionHeader} style={{ marginBottom: 0 }}>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>04 · Events & Showcases</span>
+              <h2 className={styles.sectionHeadingLarge}>Upcoming Gathering</h2>
+              <p className={styles.sectionHeadingSub}>
+                Hands-on hackathons, summits, and builder demos organized by GWD across campuses.
+              </p>
+            </div>
+            <Link href="/events" className={styles.viewAllEventsLink}>
+              <span>All events & schedule</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          {featuredEvent && (
+            <div className={`${styles.eventFeatureBanner} reveal ${eventReveal.isVisible ? 'visible' : ''}`}>
+              <div className={styles.eventBannerMediaCol}>
+                <img
+                  src={featuredEvent.image}
+                  alt={featuredEvent.title}
+                  className={styles.eventBannerImg}
+                />
+                <div className={styles.eventBannerCategoryBadge}>
+                  {featuredEvent.category}
+                </div>
+                <div className={styles.eventLiveStatusBadge}>
+                  <span className={styles.livePulseDot} />
+                  <span>REGISTRATIONS OPEN</span>
+                </div>
+                <div className={styles.eventVisualBottomBar}>
+                  <div className={styles.dateBlock}>
+                    <span className={styles.dateBlockMonth}>NOV</span>
+                    <span className={styles.dateBlockDay}>22</span>
+                  </div>
+                  <div className={styles.visualMetaText}>
+                    <span className={styles.visualMetaTitle}>VJIT Campus · Hyderabad</span>
+                    <span className={styles.visualMetaSub}>Annual Builder Showcase & Hackathon</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.eventBannerDetailsCol}>
+                <div>
+                  <div className={styles.eventDateBadge}>
+                    <span className={styles.dateCalIcon}>📅</span>
+                    <span>{featuredEvent.date} • {featuredEvent.time}</span>
+                  </div>
+
+                  <h3 className={styles.eventBannerTitle}>{featuredEvent.title}</h3>
+                  <p className={styles.eventBannerDesc}>{featuredEvent.description}</p>
+                </div>
+
+                <div className={styles.eventMetaGrid}>
+                  <div className={styles.eventMetaCard}>
+                    <span className={styles.metaIcon}>📍</span>
+                    <div>
+                      <span className={styles.metaLabel}>LOCATION & VENUE</span>
+                      <span className={styles.metaValue}>{featuredEvent.location}</span>
+                    </div>
+                  </div>
+                  <div className={styles.eventMetaCard}>
+                    <span className={styles.metaIcon}>👥</span>
+                    <div>
+                      <span className={styles.metaLabel}>ATTENDANCE CAP</span>
+                      <span className={styles.metaValue}>{featuredEvent.capacity || 150} Builder Seats</span>
+                    </div>
+                  </div>
+                  <div className={styles.eventMetaCard}>
+                    <span className={styles.metaIcon}>⚡</span>
+                    <div>
+                      <span className={styles.metaLabel}>EVENT TRACKS</span>
+                      <span className={styles.metaValue}>Full-Stack • Design • Sports OS</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.eventActionRow}>
+                  <Link href={`/events/${featuredEvent.id}/register`} className={styles.btnEventRegister}>
+                    <span>Register for Event</span>
+                    <span>→</span>
+                  </Link>
+                  <Link href={`/events/${featuredEvent.id}`} className={styles.btnEventDetails}>
+                    <span>Full Schedule & Details</span>
+                    <span>↗</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 6: LEADERSHIP SPOTLIGHT
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.presidentSection} ref={leaderReveal.ref} data-dye-section="team">
+        <div className="container">
+          <div className={styles.sectionHeader}>
+            <span className="label" style={{ color: 'var(--brand-red)' }}>05 · Executive Direction</span>
+            <h2 className={styles.sectionHeadingLarge}>Leadership & Direction</h2>
+            <p className={styles.sectionHeadingSub}>
+              Structured leadership driving accountability, project delivery, and student transformation.
+            </p>
+          </div>
+
+          <div className={`${styles.presidentFeatureCard} reveal ${leaderReveal.isVisible ? 'visible' : ''}`}>
+            <div className={styles.presidentPortraitCol}>
+              <div className={styles.portraitWrap}>
+                <img
+                  src={president.photo || '/team/president.jpg'}
+                  alt={president.name}
+                  className={styles.presidentImg}
+                />
+                <div className={styles.portraitTag}>CLUB LEADERSHIP · SLOT 01</div>
+              </div>
+            </div>
+
+            <div className={styles.presidentDetailsCol}>
+              <span className={styles.leaderRoleChip}>{president.role} · GWD Club</span>
+              <h3 className={styles.presidentName}>{president.name}</h3>
+              <p className={styles.presidentBio}>{president.bio}</p>
+
+              {president.quote && (
+                <blockquote className={styles.presidentQuoteBox}>
+                  &ldquo;{president.quote}&rdquo;
+                </blockquote>
+              )}
+
+              <div className={styles.leaderCtaRow}>
+                <Link href="/team" className={styles.btnFullHierarchy}>
+                  Meet the Full Team →
+                </Link>
+                <Link href="/explore" className={styles.btnSecondary} style={{ display: 'inline-flex' }}>
+                  Explore Working Domains
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 7: SELECTED COLLABORATION
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.collabSection} ref={collabReveal.ref} data-dye-section="collab">
+        <div className="container">
+          <div className={styles.collabHeaderRow}>
+            <div className={styles.sectionHeader} style={{ marginBottom: 0 }}>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>06 · Collaborations</span>
+              <h2 className={styles.sectionHeadingLarge}>Partners & Ecosystem</h2>
+              <p className={styles.sectionHeadingSub}>
+                Organizations, institutions, and clients powering GWD&apos;s build velocity across borders.
+              </p>
+            </div>
+            <Link href="/collaborations" className={styles.viewCollabLink}>
+              <span>View all collaborations</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          <div className={styles.collabGrid}>
+            <DyeContainedCard
+              badge="ECOSYSTEM ENGINE"
+              title="The GWD Collective Mesh"
+              description="Real-time execution network connecting student builders, enterprise sponsors, and industry labs across India and worldwide."
+              theme="light"
+              height={220}
+            />
+            {store.collaborations.slice(0, 2).map((c) => (
+              <div key={c.name} className={styles.collabCard}>
+                <div className={styles.collabTopRow}>
+                  <span className={styles.collabTypeBadge}>{c.type}</span>
+                  <span className={styles.collabYearBadge}>{c.year}</span>
+                </div>
+                <h3 className={styles.collabName}>{c.name}</h3>
+                <p className={styles.collabDesc}>{c.description}</p>
+                <div className={styles.collabOutcomeBox}>
+                  <span className={styles.outcomeTag}>OUTCOME:</span>
+                  <span className={styles.outcomeVal}>{c.outcome}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 7.4: SLIDE 9 — BUILT IN HYDERABAD. WORKING ACROSS 10 COUNTRIES.
+          ═══════════════════════════════════════════════════════════════ */}
+      <GlobalPresence />
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 7.5: WHO WE'VE BUILT FOR — DARK HARDWARE CONSOLE
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.clientsConsoleSection} data-dye-section="collab">
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div className={styles.clientsConsoleHeader}>
+            <div>
+              <span className="label" style={{ color: 'var(--brand-red)' }}>• Who we&apos;ve built for</span>
+              <h2 className={styles.clientsConsoleTitle}>Enterprise &amp; Growth Alliances</h2>
+            </div>
+            <p className={styles.clientsConsoleSub}>
+              Enterprise and growth-stage clients across ten countries and three continents.
+            </p>
+          </div>
+
+          {/* Kinetic Marquee Scroller with Dark Hardware Beveled Keycaps */}
+          <GwdClientScroller theme="dark" />
+
+          <p className={styles.clientsConsoleDisclaimer}>
+            {CLIENT_DISCLAIMER}
+          </p>
+
+          {/* Bottom Bar: Who we build with */}
+          <div className={styles.ecosystemConsoleBar}>
+            <span className={styles.ecosystemConsoleBadge}>
+              Who we build with
+            </span>
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <EcosystemScroller theme="dark" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 8: CLUB & GLOBAL STATS STRIP
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.statsStripSection} ref={statsReveal.ref} data-dye-section="stats">
+        <div className="container">
+          <div className={`${styles.sectionHeader} reveal ${statsReveal.isVisible ? 'visible' : ''}`} style={{ textAlign: 'center', margin: '0 auto var(--space-2xl)' }}>
+            <span className="label" style={{ color: 'var(--brand-red)' }}>07 · Impact</span>
+            <h2 className={styles.sectionHeadingLarge}>The Journey So Far</h2>
+          </div>
+          <div className={`${styles.statsStripGrid} reveal ${statsReveal.isVisible ? 'visible' : ''}`}>
+            {statsCms.map((stat) => (
+              <StatItem
+                key={stat.label}
+                label={stat.label}
+                value={stat.value}
+                suffix={stat.suffix}
+                prefix={stat.prefix}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 9: FINAL CALL TO ACTION
+          ═══════════════════════════════════════════════════════════════ */}
+      <section className={styles.finalCtaSection} ref={ctaReveal.ref} data-dye-section="cta">
+        <DyeCtaBackdrop
+          tag={finalCtaCms.tag || 'JOIN THE COLLECTIVE'}
+          title={
+            <>
+              {finalCtaCms.headline || 'Have an idea?'}
+              <br />
+              <span className={styles.finalCtaRed}>{finalCtaCms.highlightWord || "Let's get it done."}</span>
+            </>
+          }
+          subtitle={
+            finalCtaCms.subtitle ||
+            'Whether you want to build projects, organize national events, or sharpen your craft — GWD is where ideas become shipped work.'
+          }
+          primaryCtaText={finalCtaCms.primaryText || 'Join GWD'}
+          primaryCtaHref={finalCtaCms.primaryHref || '/join'}
+          secondaryCtaText={finalCtaCms.secondaryText || 'Explore Domains'}
+          secondaryCtaHref={finalCtaCms.secondaryHref || '/explore'}
+        />
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          WATCH FILM MODAL (Full Screen High Resolution Player)
+          ═══════════════════════════════════════════════════════════════ */}
       {showVideoModal && (
-        <div className={styles.videoModal} onClick={() => setShowVideoModal(false)}>
-          <div className={styles.videoModalInner} onClick={e => e.stopPropagation()}>
+        <div
+          className={styles.videoModal}
+          onClick={closeWatchFilmModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="GWD Introduction Film"
+        >
+          <div className={styles.videoModalInner} onClick={(e) => e.stopPropagation()}>
             <button
+              ref={closeModalBtnRef}
               type="button"
               className={styles.closeModalBtn}
-              onClick={() => setShowVideoModal(false)}
+              onClick={closeWatchFilmModal}
               aria-label="Close video"
             >
               ✕
             </button>
             <video
-              src="/gwd-hero.mp4"
+              ref={modalVideoRef}
+              className={styles.modalVideoPlayer}
               controls
               autoPlay
-              className={styles.modalVideoPlayer}
-            />
+              playsInline
+            >
+              <source src={heroCms.videoUrl || '/gwd-hero.mp4'} type="video/mp4" />
+              <source src={heroCms.fallbackVideoUrl || '/new-era-hero.mp4'} type="video/mp4" />
+            </video>
           </div>
         </div>
       )}
-
-      {/* ══════════ 02. LEADERSHIP ══════════ */}
-      <Leadership />
-
-      {/* ══════════ 03. ABOUT ══════════ */}
-      <section className={styles.about} id="about">
-        <div className={styles.aboutInner} ref={aboutReveal.ref}>
-          <div className={`${styles.aboutGrid} ${aboutReveal.isVisible ? 'visible' : ''}`}>
-            <div className={`${styles.aboutText} reveal ${aboutReveal.isVisible ? 'visible' : ''}`}>
-              <p className={styles.sectionLabel}>Who We Are</p>
-              <h2 className={styles.aboutHeading}>
-                Where technology meets creativity, and ideas become shipped work.
-              </h2>
-              <p className={styles.aboutBody}>
-                GWD is a community of makers, thinkers, and builders who believe that the best ideas happen when disciplines collide. We bring together students from engineering, design, arts, and business to create projects, host events, and build experiences that matter.
-              </p>
-              <p className={styles.aboutBody}>
-                <strong>Our Mission:</strong> To create a space where students from diverse backgrounds collaborate to build meaningful projects and grow as creators.
-              </p>
-            </div>
-            <div className={`${styles.aboutImage} reveal-scale ${aboutReveal.isVisible ? 'visible' : ''}`}>
-              <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
-                alt="GWD members working together"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats ── */}
-      <section className={styles.stats}>
-        <div className={styles.statsInner}>
-          {STATS.map((stat) => (
-            <StatCounter key={stat.label} {...stat} />
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════ 04. WHAT GWD DOES ══════════ */}
-      <section className={styles.activities} id="activities">
-        <div className={styles.activitiesInner} ref={activitiesReveal.ref}>
-          <div className={`reveal ${activitiesReveal.isVisible ? 'visible' : ''}`}>
-            <p className={styles.sectionLabel}>What We Do</p>
-            <h2 className={styles.activitiesTitle}>
-              Six verticals. One collective mission.
-            </h2>
-          </div>
-
-          <div className={`${styles.activitiesGrid} reveal ${activitiesReveal.isVisible ? 'visible' : ''}`} style={{ transitionDelay: '200ms' }}>
-            <div className={styles.activitiesList}>
-              {ACTIVITIES.map((activity, i) => (
-                <div
-                  key={activity.id}
-                  className={`${styles.activityItem} ${i === activeActivity ? styles.activityItemActive : ''}`}
-                  onClick={() => setActiveActivity(i)}
-                  onMouseEnter={() => setActiveActivity(i)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && setActiveActivity(i)}
-                  aria-selected={i === activeActivity}
-                >
-                  <span className={styles.activityTitle}>{activity.title}</span>
-                  <span className={styles.activityDesc}>{activity.description}</span>
-                </div>
-              ))}
-            </div>
-            <div className={styles.activitiesImageWrap}>
-              <img
-                src={ACTIVITIES[activeActivity].image}
-                alt={ACTIVITIES[activeActivity].title}
-                loading="lazy"
-                key={activeActivity}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ 05. PROJECTS ══════════ */}
-      <section className={styles.projects} id="work">
-        <div className={styles.projectsInner} ref={projectsReveal.ref}>
-          <div className={`${styles.projectsHeader} reveal ${projectsReveal.isVisible ? 'visible' : ''}`}>
-            <div>
-              <p className={styles.sectionLabel}>Featured Work</p>
-              <h2 className={styles.sectionTitle}>Projects that made an impact.</h2>
-            </div>
-            <Link href="/work" className="btn btn-secondary">View All Work →</Link>
-          </div>
-
-          <div className={styles.projectsList}>
-            {PROJECTS.slice(0, 3).map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ 06. UPCOMING EVENT ══════════ */}
-      {featuredEvent && (
-        <section className={styles.featuredEvent} id="events" ref={eventReveal.ref}>
-          <div className={styles.featuredEventBg}>
-            <img src={featuredEvent.image} alt="" aria-hidden="true" />
-          </div>
-          <div className={`${styles.featuredEventContent} reveal ${eventReveal.isVisible ? 'visible' : ''}`}>
-            <div className={styles.featuredEventText}>
-              <span className="badge-red">Upcoming Event</span>
-              <p className={styles.featuredEventDate}>
-                {new Date(featuredEvent.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              </p>
-              <h2 className={styles.featuredEventTitle}>{featuredEvent.title}</h2>
-              <p className={styles.featuredEventDesc}>{featuredEvent.shortDescription}</p>
-              <div className={styles.featuredEventMeta}>
-                <span>📍 {featuredEvent.location}</span>
-                <span>🕐 {featuredEvent.time}</span>
-              </div>
-              <div>
-                <Link href={`/events/${featuredEvent.id}`} className="btn btn-primary">
-                  Register Now
-                </Link>
-              </div>
-            </div>
-            <div className={styles.featuredEventImage}>
-              <img src={featuredEvent.image} alt={featuredEvent.title} loading="lazy" />
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ══════════ 07. HOW GWD WORKS ══════════ */}
-      <section className={styles.workflow} ref={workflowRef}>
-        <div className={styles.workflowInner} ref={workflowReveal.ref}>
-          <div className={`${styles.workflowHeader} reveal ${workflowReveal.isVisible ? 'visible' : ''}`}>
-            <p className={styles.sectionLabel}>How It Works</p>
-            <h2 className={styles.sectionTitle}>From idea to execution — how GWD runs events.</h2>
-          </div>
-
-          <div className={styles.workflowSteps}>
-            {EVENT_WORKFLOW.map((step, i) => (
-              <div
-                key={step.step}
-                className={`${styles.workflowStep} ${i <= activeWorkflow ? styles.workflowStepActive : ''}`}
-              >
-                <div className={styles.workflowStepNumber}>
-                  {step.icon}
-                </div>
-                <div className={styles.workflowStepContent}>
-                  <h3 className={styles.workflowStepTitle}>{step.title}</h3>
-                  <p className={styles.workflowStepDesc}>{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ 08. COLLABORATIONS ══════════ */}
-      <section className={styles.collaborations} id="collaborations" ref={collabReveal.ref}>
-        <div className={styles.collabInner}>
-          <div className={`${styles.collabHeader} reveal ${collabReveal.isVisible ? 'visible' : ''}`}>
-            <p className={styles.sectionLabel}>Collaborations</p>
-            <h2 className={styles.sectionTitle}>Partners who believe in what we build.</h2>
-          </div>
-
-          <div className={`${styles.collabGrid} reveal ${collabReveal.isVisible ? 'visible' : ''}`} style={{ transitionDelay: '200ms' }}>
-            {COLLABORATIONS.filter(c => c.featured).map((collab) => (
-              <div key={collab.id} className={styles.collabCard}>
-                <div className={styles.collabCardImage}>
-                  <img src={collab.image} alt={collab.name} loading="lazy" />
-                </div>
-                <div className={styles.collabCardBody}>
-                  <span className={styles.collabCardType}>{collab.type}</span>
-                  <h3 className={styles.collabCardName}>{collab.name}</h3>
-                  <p className={styles.collabCardDesc}>{collab.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-2xl)' }}>
-            <Link href="/collaborations" className="btn btn-secondary">View All Collaborations →</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Gallery ── */}
-      <section className={styles.gallerySectionWrap} ref={galleryReveal.ref}>
-        <div className={`${styles.gallerySectionInner} reveal ${galleryReveal.isVisible ? 'visible' : ''}`}>
-          <div className={styles.galleryHeader}>
-            <p className={styles.sectionLabel}>Memories</p>
-            <h2 className={styles.sectionTitle}>Moments that define us.</h2>
-          </div>
-          <ImageFanCarousel
-            images={GALLERY_IMAGES.slice(0, 8).map(img => ({ src: img.src, caption: img.caption }))}
-          />
-        </div>
-      </section>
-
-      {/* ══════════ 09. JOURNEY ══════════ */}
-      <section className={styles.timeline} id="timeline" ref={timelineReveal.ref}>
-        <div className={styles.timelineInner}>
-          <div className={`${styles.timelineHeader} reveal ${timelineReveal.isVisible ? 'visible' : ''}`}>
-            <p className={styles.sectionLabel}>Our Journey</p>
-            <h2 className={styles.sectionTitle}>From founding to today.</h2>
-          </div>
-
-          <div className={styles.timelineItems}>
-            {TIMELINE.map((item) => (
-              <TimelineItem key={item.year} item={item} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ 10. FINAL CTA ══════════ */}
-      <section className={styles.finalCta} ref={ctaReveal.ref}>
-        <div className={`${styles.finalCtaInner} reveal ${ctaReveal.isVisible ? 'visible' : ''}`}>
-          <p className="label-red">Ready?</p>
-          <h2 className={styles.finalCtaTitle}>
-            Be part of something bigger.
-          </h2>
-          <p className={styles.finalCtaDesc}>
-            Whether you want to join our team or collaborate on something meaningful — we&apos;d love to hear from you.
-          </p>
-          <div className={styles.finalCtaButtons}>
-            <Link href="/join" className="btn btn-primary btn-lg">Join GWD</Link>
-            <Link href="/collaborations" className="btn btn-secondary btn-lg" style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'white' }}>Collaborate With Us</Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* ── Sub-components ── */
-function ProjectCard({ project, index }: { project: typeof PROJECTS[0]; index: number }) {
-  const { ref, isVisible } = useReveal();
-
-  return (
-    <div ref={ref} className={`${styles.projectCard} reveal ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: `${index * 150}ms` }}>
-      <div className={styles.projectImageWrap}>
-        <img src={project.heroImage} alt={project.title} loading="lazy" />
-      </div>
-      <div>
-        <div className={styles.projectMeta}>
-          <span className="badge">{project.category}</span>
-          <span className="label">{project.year}</span>
-        </div>
-        <h3 className={styles.projectCardTitle}>{project.title}</h3>
-        <p className={styles.projectCardDesc}>{project.shortDescription}</p>
-        <p className={styles.projectOutcome}>✦ {project.outcome}</p>
-        <Link href={`/work/${project.id}`} className={styles.projectLink}>
-          View Project →
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function TimelineItem({ item }: { item: typeof TIMELINE[0] }) {
-  const { ref, isVisible } = useReveal(0.2);
-
-  return (
-    <div ref={ref} className={`${styles.timelineItem} ${isVisible ? styles.timelineItemVisible : ''} reveal ${isVisible ? 'visible' : ''}`}>
-      <div>
-        <span className={styles.timelineYear}>{item.year}</span>
-        <h3 className={styles.timelineItemTitle}>{item.title}</h3>
-        <p className={styles.timelineItemDesc}>{item.description}</p>
-        {item.achievement && (
-          <span className={styles.timelineAchievement}>✦ {item.achievement}</span>
-        )}
-      </div>
-      <div className={styles.timelineItemImage}>
-        <img src={item.image} alt={item.title} loading="lazy" />
-      </div>
     </div>
   );
 }
