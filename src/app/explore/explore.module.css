@@ -392,6 +392,24 @@
   background: #EAEAEA;
 }
 
+.memberAvatarPlaceholder {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #18181B;
+  border: 1.5px solid rgba(225, 29, 72, 0.45);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .memberName {
   font-family: var(--font-display, sans-serif);
   font-size: 1.05rem;
@@ -499,6 +517,41 @@
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--brand-red, #C41E1E);
+}
+
+.drawerAvatarPlaceholder {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #18181B;
+  border: 3px solid var(--brand-red, #C41E1E);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.leadAvatarPlaceholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #18181B;
+  border: 2px solid rgba(255, 82, 82, 0.5);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .drawerName {

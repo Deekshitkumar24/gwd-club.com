@@ -80,11 +80,17 @@ export default function ExplorePage() {
             <div className={styles.leadCard}>
               <BorderBeam size={200} duration={12} colorFrom="#FF5252" colorTo="#FF8A65" borderWidth={1.5} />
               <div className={styles.leadCardHeader}>
-                <img
-                  src={activeDomain.leadPhoto || '/team/president.jpg'}
-                  alt={activeDomain.leadName}
-                  className={styles.leadAvatar}
-                />
+                {activeDomain.leadPhoto ? (
+                  <img
+                    src={activeDomain.leadPhoto}
+                    alt={activeDomain.leadName}
+                    className={styles.leadAvatar}
+                  />
+                ) : (
+                  <div className={styles.leadAvatarPlaceholder}>
+                    <span>{activeDomain.leadName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'LD'}</span>
+                  </div>
+                )}
                 <div className={styles.leadMeta}>
                   <span className={styles.leadRoleTag}>{activeDomain.leadRole}</span>
                   <h3 className={styles.leadName}>{activeDomain.leadName}</h3>
@@ -104,12 +110,14 @@ export default function ExplorePage() {
             <div className={styles.membersHeaderRow}>
               <h3 className={styles.membersTitle}>{activeDomain.name} Team Members</h3>
               <span className={styles.memberCountTag}>
-                {activeDomain.members.length} verified builders
+                {(activeDomain.members || []).filter((m) => m.active !== false).length} verified builders
               </span>
             </div>
 
             <div className={styles.membersGrid}>
-              {activeDomain.members.map((member) => (
+              {(activeDomain.members || [])
+                .filter((member) => member.active !== false)
+                .map((member) => (
                 <div
                   key={member.id}
                   className={styles.memberCard}
@@ -125,11 +133,17 @@ export default function ExplorePage() {
                 >
                   <BorderBeam size={160} duration={10} colorFrom="#E11D48" colorTo="#F59E0B" borderWidth={1} />
                   <div className={styles.memberCardTop}>
-                    <img
-                      src={member.photo || '/team/president.jpg'}
-                      alt={member.name}
-                      className={styles.memberPhoto}
-                    />
+                    {member.photo ? (
+                      <img
+                        src={member.photo}
+                        alt={member.name}
+                        className={styles.memberPhoto}
+                      />
+                    ) : (
+                      <div className={styles.memberAvatarPlaceholder}>
+                        <span>{member.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'GB'}</span>
+                      </div>
+                    )}
                     <div>
                       <h4 className={styles.memberName}>{member.name}</h4>
                       <p className={styles.memberRole}>{member.role}</p>
@@ -169,11 +183,17 @@ export default function ExplorePage() {
             </button>
 
             <div className={styles.drawerPhotoWrap}>
-              <img
-                src={selectedMember.photo || '/team/president.jpg'}
-                alt={selectedMember.name}
-                className={styles.drawerPhoto}
-              />
+              {selectedMember.photo ? (
+                <img
+                  src={selectedMember.photo}
+                  alt={selectedMember.name}
+                  className={styles.drawerPhoto}
+                />
+              ) : (
+                <div className={styles.drawerAvatarPlaceholder}>
+                  <span>{selectedMember.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'GB'}</span>
+                </div>
+              )}
               <div>
                 <h3 className={styles.drawerName}>{selectedMember.name}</h3>
                 <p className={styles.drawerRole}>{selectedMember.role}</p>
