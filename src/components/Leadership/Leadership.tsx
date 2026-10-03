@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useReveal } from '@/hooks/useAnimations';
+import { useCms } from '@/context/CmsContext';
 import { NINE_LEADERS, LeaderSlot } from '@/data/content';
 import GwdPlaceholder from '@/components/GwdPlaceholder/GwdPlaceholder';
 import styles from './Leadership.module.css';
@@ -140,10 +141,13 @@ function LeadershipCard({
 /* ── Main Leadership Component ── */
 export default function Leadership() {
   const headerReveal = useReveal(0.15);
+  const { store } = useCms();
 
-  const president = NINE_LEADERS[0];
-  const seniorTier = NINE_LEADERS.slice(1, 4); // Vice President, General Secretary, Technical Lead
-  const leadTier = NINE_LEADERS.slice(4); // Creative, Marketing, Event Management, PR, Visual Media
+  const publishedLeaders = (store.leaders ?? []).filter((l) => !l.status || l.status === 'Published');
+  const leaders = publishedLeaders.length > 0 ? publishedLeaders : NINE_LEADERS;
+  const president = leaders[0];
+  const seniorTier = leaders.slice(1, 4); // Vice President, General Secretary, Technical Lead
+  const leadTier = leaders.slice(4); // Creative, Marketing, Event Management, PR, Visual Media
 
   return (
     <section className={styles.section} id="leadership">

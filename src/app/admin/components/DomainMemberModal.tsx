@@ -83,10 +83,25 @@ export default function DomainMemberModal({
 
     try {
       setIsCompressing(true);
-      const compressedDataUrl = await compressImageFile(file, 800, 800, 0.82);
-      setFormData((prev) => ({ ...prev, photo: compressedDataUrl }));
-    } catch {
-      setError('Unable to compress profile photo. Please try a different image.');
+      setError(null);
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('category', 'team');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Upload failed');
+      }
+
+      setFormData((prev) => ({ ...prev, photo: json.url }));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to upload profile photo';
+      setError(msg);
     } finally {
       setIsCompressing(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

@@ -159,13 +159,30 @@ export default function AdminPortal() {
     const file = e.target.files?.[0];
     if (!file || !selectedDomain) return;
     try {
-      const compressed = await compressImageFile(file, 800, 800, 0.82);
-      const updated = { ...selectedDomain, leadPhoto: compressed };
+      showToast('Uploading photo to media storage...');
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('category', 'team');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Upload failed');
+      }
+
+      const updated = { ...selectedDomain, leadPhoto: json.url };
       setSelectedDomain(updated);
       updateDomain(selectedDomain.id, updated);
-      showToast(`Updated lead photo for ${selectedDomain.name}`);
-    } catch {
-      showToast('Error compressing image');
+      showToast(`Updated lead photo for ${selectedDomain.name}!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error uploading photo';
+      showToast(msg);
+    } finally {
+      if (domainLeadFileInputRef.current) domainLeadFileInputRef.current.value = '';
     }
   };
 
@@ -480,38 +497,43 @@ export default function AdminPortal() {
   // ── Operations & Mutations ──
 
   // Media File Upload Handler
-  const handleBatchMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBatchMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    showToast(`Uploading ${files.length} file(s) to media storage...`);
     let count = 0;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        const sizeKb = Math.round(file.size / 1024);
-        const sizeStr = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`;
+    for (const file of Array.from(files)) {
+      try {
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        uploadData.append('category', 'gallery');
 
-        const newRecord: MediaRecord = {
-          id: `media-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-          name: file.name.replace(/\.[^/.]+$/, ''),
-          url: dataUrl,
-          type: 'image',
-          category: 'gallery',
-          size: sizeStr,
-          uploadedAt: new Date().toISOString(),
-          tags: ['uploaded', 'admin-library'],
-        };
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadData,
+        });
 
-        addMedia(newRecord);
-        count++;
-        if (count === files.length) {
-          showToast(`Successfully uploaded ${count} media asset(s)!`);
+        const json = await res.json();
+        if (res.ok && json.success) {
+          const newRecord: MediaRecord = {
+            id: json.id,
+            name: json.name,
+            url: json.url,
+            type: 'image',
+            category: 'gallery',
+            size: json.size,
+            uploadedAt: json.uploadedAt || new Date().toISOString(),
+            tags: ['uploaded', 'admin-library'],
+          };
+          addMedia(newRecord);
+          count++;
         }
-      };
-      reader.readAsDataURL(file);
-    });
-
+      } catch (err) {
+        console.error('Batch upload error:', err);
+      }
+    }
+    showToast(`Successfully uploaded ${count} media asset(s)!`);
     e.target.value = '';
   };
 

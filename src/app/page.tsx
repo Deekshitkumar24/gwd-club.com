@@ -17,6 +17,7 @@ import {
 } from '@/data/content';
 import { DyeAtmosphereTransition, DyeContainedCard, DyeCtaBackdrop } from '@/components/DyeVisual';
 import { BorderBeam } from '@/components/ui/border-beam';
+import GwdPlaceholder from '@/components/GwdPlaceholder/GwdPlaceholder';
 import styles from './page.module.css';
 
 type HeroState = 'loading' | 'playing' | 'transitioning' | 'revealed';
@@ -635,11 +636,29 @@ export default function HomePage() {
               {domainsList[activeDiscipline] && (
                 <div className={styles.previewCard}>
                   <div className={styles.previewImageWrap}>
-                    <img
-                      src={domainsList[activeDiscipline].leadPhoto || '/team/president.jpg'}
-                      alt={domainsList[activeDiscipline].name}
-                      className={styles.previewImage}
-                    />
+                    {domainsList[activeDiscipline].leadPhoto ? (
+                      <img
+                        src={domainsList[activeDiscipline].leadPhoto}
+                        alt={domainsList[activeDiscipline].name}
+                        className={styles.previewImage}
+                      />
+                    ) : (
+                      <div
+                        className={styles.previewImage}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'linear-gradient(135deg, rgba(225,29,72,0.18), rgba(18,18,18,0.95))',
+                          color: 'var(--brand-red)',
+                          fontSize: '2.5rem',
+                          fontWeight: 800,
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        {domainsList[activeDiscipline].code}
+                      </div>
+                    )}
                     <div className={styles.previewOverlay}>
                       <span className={styles.previewIndex}>0{activeDiscipline + 1}</span>
                       <span className={styles.previewCategory}>DOMAIN FOCUS · {domainsList[activeDiscipline].code}</span>
@@ -928,11 +947,15 @@ export default function HomePage() {
             <div className={`${styles.presidentFeatureCard} reveal ${leaderReveal.isVisible ? 'visible' : ''}`}>
               <div className={styles.presidentPortraitCol}>
                 <div className={styles.portraitWrap}>
-                  <img
-                    src={president.photo || '/team/president.jpg'}
-                    alt={president.name}
-                    className={styles.presidentImg}
-                  />
+                  {president.photo ? (
+                    <img
+                      src={president.photo}
+                      alt={president.name}
+                      className={styles.presidentImg}
+                    />
+                  ) : (
+                    <GwdPlaceholder name={president.name} role={president.role} />
+                  )}
                   <div className={styles.portraitTag}>CLUB LEADERSHIP · SLOT 01</div>
                 </div>
               </div>

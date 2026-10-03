@@ -347,7 +347,35 @@ export async function updateSiteSettingAction(key: string, value: unknown) {
     updated_at: new Date().toISOString(),
   } as any);
   if (error) throw new Error(`Failed to update setting '${key}': ${error.message}`);
-  revalidatePublic('/');
+  
+  if (key === 'domains') {
+    revalidatePublic('/', '/explore', '/team');
+  } else if (key === 'partnership_lead') {
+    revalidatePublic('/', '/connect');
+  } else if (key === 'workflow') {
+    revalidatePublic('/', '/workflow');
+  } else if (key === 'footer') {
+    revalidatePublic('/', '/explore', '/team', '/work', '/events');
+  } else {
+    revalidatePublic('/');
+  }
+
+  return { success: true };
+}
+
+// ── Media Management ──
+
+export async function deleteMediaAction(id: string, storagePath?: string) {
+  const supabase = await getAuthenticatedClient();
+  if (storagePath) {
+    try {
+      await supabase.storage.from('media').remove([storagePath]);
+    } catch {
+      // Non-fatal if file was already removed
+    }
+  }
+  const { error } = await supabase.from('media').delete().eq('id', id);
+  if (error) throw new Error(`Failed to delete media record: ${error.message}`);
   return { success: true };
 }
 

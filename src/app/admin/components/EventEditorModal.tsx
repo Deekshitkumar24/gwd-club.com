@@ -146,15 +146,30 @@ export default function EventEditorModal({
   };
 
   // Image Upload / Replace
-  const handleDirectImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDirectImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    compressImageFile(file, 1400, 1400, 0.82)
-      .then((dataUrl) => {
-        setFormData((prev) => ({ ...prev, image: dataUrl }));
-      })
-      .catch(() => alert('Failed to process image.'));
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('category', 'events');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Upload failed');
+      }
+
+      setFormData((prev) => ({ ...prev, image: json.url }));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload event image';
+      alert(msg);
+    }
   };
 
   // Save Event

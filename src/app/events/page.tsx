@@ -29,7 +29,7 @@ export default function EventsPage() {
           month: itemAny.month || 'March',
           headline: m.title,
           content: itemAny.story || m.description || '',
-          image: m.image || '/img/vjit-inauguration.jpg',
+          image: m.image || undefined,
           track: idx % 2 === 0 ? 'top' : 'bottom',
         };
       })

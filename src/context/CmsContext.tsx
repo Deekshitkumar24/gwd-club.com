@@ -60,6 +60,7 @@ import {
   deleteRegistrationAction,
   updateConnectRequestStatusAction,
   deleteConnectRequestAction,
+  deleteMediaAction,
 } from '@/app/admin/actions';
 
 interface CmsContextType {
@@ -619,14 +620,22 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Media ──
-  const addMedia = useCallback((_media: MediaRecord) => {
-    // TODO: Implement Supabase Storage upload
-    setStore((prev) => ({ ...prev, media: [_media, ...prev.media] }));
+  const addMedia = useCallback((mediaItem: MediaRecord) => {
+    setStore((prev) => ({
+      ...prev,
+      media: [mediaItem, ...prev.media.filter((m) => m.id !== mediaItem.id)],
+    }));
   }, []);
 
   const deleteMedia = useCallback((id: string) => {
-    setStore((prev) => ({ ...prev, media: prev.media.filter((m) => m.id !== id) }));
-  }, []);
+    setStore((prev) => {
+      const target = prev.media.find((m) => m.id === id);
+      dbMutation(async () => {
+        await deleteMediaAction(id, target?.url);
+      });
+      return { ...prev, media: prev.media.filter((m) => m.id !== id) };
+    });
+  }, [dbMutation]);
 
   const updateMedia = useCallback((id: string, patch: Partial<MediaRecord>) => {
     setStore((prev) => ({

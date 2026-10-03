@@ -37,37 +37,49 @@ export default function MediaPickerModal({
     return matchSearch && matchCat;
   });
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
-    compressImageFile(file, 1200, 1200, 0.82)
-      .then((dataUrl) => {
-        const sizeKb = Math.round(dataUrl.length * 0.75 / 1024);
-        const sizeStr = `${sizeKb} KB`;
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', categoryFilter === 'all' ? 'gallery' : categoryFilter);
 
-        const newRecord: MediaRecord = {
-          id: `media-${Date.now().toString(36)}`,
-          name: file.name.replace(/\.[^/.]+$/, ''),
-          url: dataUrl,
-          type: 'image',
-          category: 'gallery',
-          size: sizeStr,
-          uploadedAt: new Date().toISOString(),
-          tags: ['uploaded', 'admin-picker'],
-        };
-
-        addMedia(newRecord);
-        setIsUploading(false);
-        onSelect(dataUrl);
-        onClose();
-      })
-      .catch((err) => {
-        console.error('Image compression error:', err);
-        setIsUploading(false);
-        alert('Failed to process image file.');
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Upload failed');
+      }
+
+      const newRecord: MediaRecord = {
+        id: json.id,
+        name: json.name,
+        url: json.url,
+        type: 'image',
+        category: (categoryFilter === 'all' ? 'gallery' : categoryFilter) as MediaRecord['category'],
+        size: json.size,
+        uploadedAt: json.uploadedAt || new Date().toISOString(),
+        tags: ['uploaded', 'admin-picker'],
+      };
+
+      addMedia(newRecord);
+      setIsUploading(false);
+      onSelect(json.url);
+      onClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload image file';
+      console.error('Image upload error:', msg);
+      setIsUploading(false);
+      alert(`Upload failed: ${msg}`);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   return (
