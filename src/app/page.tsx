@@ -13,12 +13,9 @@ import {
   NINE_LEADERS,
   PROJECTS,
   COLLABORATIONS,
-  CLIENT_DISCLAIMER,
   THREE_ARMS,
 } from '@/data/content';
 import { DyeAtmosphereTransition, DyeContainedCard, DyeCtaBackdrop } from '@/components/DyeVisual';
-import { GwdClientScroller, EcosystemScroller } from '@/components/ui/brand-scoller';
-import GlobalPresence from '@/components/GlobalPresence/GlobalPresence';
 import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './page.module.css';
 
@@ -1010,44 +1007,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 7.4: SLIDE 9 — BUILT IN HYDERABAD. WORKING ACROSS 10 COUNTRIES.
-          ═══════════════════════════════════════════════════════════════ */}
-      <GlobalPresence />
-
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 7.5: WHO WE'VE BUILT FOR — DARK HARDWARE CONSOLE
-          ═══════════════════════════════════════════════════════════════ */}
-      <section className={styles.clientsConsoleSection} data-dye-section="collab">
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <div className={styles.clientsConsoleHeader}>
-            <div>
-              <span className="label" style={{ color: 'var(--brand-red)' }}>• Who we&apos;ve built for</span>
-              <h2 className={styles.clientsConsoleTitle}>Enterprise &amp; Growth Alliances</h2>
-            </div>
-            <p className={styles.clientsConsoleSub}>
-              Enterprise and growth-stage clients across ten countries and three continents.
-            </p>
-          </div>
-
-          {/* Kinetic Marquee Scroller with Dark Hardware Beveled Keycaps */}
-          <GwdClientScroller theme="dark" />
-
-          <p className={styles.clientsConsoleDisclaimer}>
-            {CLIENT_DISCLAIMER}
-          </p>
-
-          {/* Bottom Bar: Who we build with */}
-          <div className={styles.ecosystemConsoleBar}>
-            <span className={styles.ecosystemConsoleBadge}>
-              Who we build with
-            </span>
-            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <EcosystemScroller theme="dark" />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
           SECTION 8: CLUB & GLOBAL STATS STRIP

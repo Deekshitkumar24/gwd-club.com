@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navigation from "@/components/Navigation/Navigation";
-import Footer from "@/components/Footer/Footer";
-import { SharedDyeProvider } from "@/components/DyeVisual";
+import PublicShell from "@/components/PublicShell";
 import { CmsProvider } from "@/context/CmsContext";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -38,11 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <CmsProvider>
-          <SharedDyeProvider>
-            <Navigation />
-            <main id="main-content">{children}</main>
-            <Footer />
-          </SharedDyeProvider>
+          <PublicShell>{children}</PublicShell>
         </CmsProvider>
         <SpeedInsights />
       </body>

@@ -1,5 +1,5 @@
-import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,10 +8,26 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.gwd_vjit_clube_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_gwd_vjit_clube_SUPABASE_URL;
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_gwd_vjit_clube_SUPABASE_ANON_KEY ||
+    process.env.gwd_vjit_clube_SUPABASE_ANON_KEY;
 
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const isLoginPage = request.nextUrl.pathname === '/admin/login';
+
+  // If Supabase is not configured, block admin dashboard access and send to login with error
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (isAdminRoute && !isLoginPage) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      url.searchParams.set('error', 'config');
+      return NextResponse.redirect(url);
+    }
     return response;
   }
 
@@ -33,7 +49,23 @@ export async function proxy(request: NextRequest) {
   });
 
   // Refresh auth session
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect unauthenticated users away from admin (except login page)
+  if (isAdminRoute && !isLoginPage && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin/login';
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect authenticated users away from login page
+  if (isLoginPage && user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin';
+    return NextResponse.redirect(url);
+  }
 
   return response;
 }

@@ -6,7 +6,6 @@ import { useReveal, useCountUp } from '@/hooks/useAnimations';
 import { useCms } from '@/context/CmsContext';
 import { CLUB, STATS, TIMELINE, THREE_ARMS, VENTURES } from '@/data/content';
 import { DyeAtmosphereTransition, DyeCtaBackdrop } from '@/components/DyeVisual';
-import GlobalPresence from '@/components/GlobalPresence/GlobalPresence';
 import { BorderBeam } from '@/components/ui/border-beam';
 import styles from './about.module.css';
 
@@ -288,12 +287,18 @@ export default function AboutPage() {
               {/* Active Chapter Card */}
               <div className={styles.chapterStage}>
                 <div className={styles.chapterVisual}>
-                  <img
-                    src={currentChapter.image}
-                    alt={currentChapter.title}
-                    className={styles.chapterImg}
-                    key={currentChapter.image}
-                  />
+                  {currentChapter.image ? (
+                    <img
+                      src={currentChapter.image}
+                      alt={currentChapter.title}
+                      className={styles.chapterImg}
+                      key={currentChapter.image}
+                    />
+                  ) : (
+                    <div className={styles.chapterPlaceholder}>
+                      <span className={styles.chapterPlaceholderYear}>{currentChapter.year}</span>
+                    </div>
+                  )}
                   <div className={styles.chapterOverlay}>
                     <span className={styles.chapterYearBadge}>{currentChapter.year}</span>
                   </div>
@@ -337,10 +342,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          07.5 — GLOBAL PRESENCE (Slide 9: Built in Hyderabad. Working across 10 countries.)
-          ═══════════════════════════════════════════════════════════════ */}
-      <GlobalPresence />
 
       {/* ═══════════════════════════════════════════════════════════════
           08 — CLOSING CTA

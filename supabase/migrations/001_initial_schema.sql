@@ -91,15 +91,28 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
+DECLARE
+  v_rec_id text;
+  v_old jsonb := NULL;
+  v_new jsonb := NULL;
 BEGIN
+  IF TG_OP IN ('UPDATE', 'DELETE') THEN
+    v_old := to_jsonb(OLD);
+    v_rec_id := COALESCE(v_old->>'id', v_old->>'key');
+  END IF;
+  IF TG_OP IN ('INSERT', 'UPDATE') THEN
+    v_new := to_jsonb(NEW);
+    v_rec_id := COALESCE(v_new->>'id', v_new->>'key', v_rec_id);
+  END IF;
+
   INSERT INTO public.audit_log (actor_id, action, table_name, record_id, old_data, new_data)
   VALUES (
     auth.uid(),
     TG_OP,
     TG_TABLE_NAME,
-    COALESCE(NEW.id::text, OLD.id::text, NULL),
-    CASE WHEN TG_OP IN ('UPDATE', 'DELETE') THEN to_jsonb(OLD) ELSE NULL END,
-    CASE WHEN TG_OP IN ('INSERT', 'UPDATE') THEN to_jsonb(NEW) ELSE NULL END
+    v_rec_id,
+    v_old,
+    v_new
   );
   RETURN COALESCE(NEW, OLD);
 END;

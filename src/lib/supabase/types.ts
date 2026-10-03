@@ -448,6 +448,150 @@ export interface Database {
           created_at?: string;
         };
       };
+      gallery_items: {
+        Row: {
+          id: string;
+          src: string;
+          caption: string | null;
+          category: string;
+          is_featured: boolean;
+          sort_order: number;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          src: string;
+          caption?: string | null;
+          category?: string;
+          is_featured?: boolean;
+          sort_order?: number;
+          status?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          src?: string;
+          caption?: string | null;
+          category?: string;
+          is_featured?: boolean;
+          sort_order?: number;
+          status?: string;
+          created_at?: string;
+        };
+      };
+      collaboration_showcases: {
+        Row: {
+          id: string;
+          name: string;
+          collab_type: string | null;
+          year: string | null;
+          description: string | null;
+          outcome: string | null;
+          logo: string | null;
+          image: string | null;
+          is_featured: boolean;
+          sort_order: number;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          collab_type?: string | null;
+          year?: string | null;
+          description?: string | null;
+          outcome?: string | null;
+          logo?: string | null;
+          image?: string | null;
+          is_featured?: boolean;
+          sort_order?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          collab_type?: string | null;
+          year?: string | null;
+          description?: string | null;
+          outcome?: string | null;
+          logo?: string | null;
+          image?: string | null;
+          is_featured?: boolean;
+          sort_order?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      connect_requests: {
+        Row: {
+          id: string;
+          request_type: string;
+          status: string;
+          full_name: string;
+          role_designation: string | null;
+          email: string;
+          phone: string | null;
+          requester_type: string | null;
+          institution_name: string;
+          institution_website: string | null;
+          city: string | null;
+          state: string | null;
+          country: string | null;
+          proposal: string | null;
+          internal_notes: string | null;
+          assigned_poc: string | null;
+          custom_data: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          request_type: string;
+          status?: string;
+          full_name: string;
+          role_designation?: string | null;
+          email: string;
+          phone?: string | null;
+          requester_type?: string | null;
+          institution_name: string;
+          institution_website?: string | null;
+          city?: string | null;
+          state?: string | null;
+          country?: string | null;
+          proposal?: string | null;
+          internal_notes?: string | null;
+          assigned_poc?: string | null;
+          custom_data?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          request_type?: string;
+          status?: string;
+          full_name?: string;
+          role_designation?: string | null;
+          email?: string;
+          phone?: string | null;
+          requester_type?: string | null;
+          institution_name?: string;
+          institution_website?: string | null;
+          city?: string | null;
+          state?: string | null;
+          country?: string | null;
+          proposal?: string | null;
+          internal_notes?: string | null;
+          assigned_poc?: string | null;
+          custom_data?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       is_admin: {
@@ -463,8 +607,8 @@ export interface Database {
           p_event_id: string;
           p_name: string;
           p_email: string;
-          p_phone?: string;
-          p_college?: string;
+          p_phone?: string | null;
+          p_college?: string | null;
           p_answers?: Json;
         };
         Returns: Json;

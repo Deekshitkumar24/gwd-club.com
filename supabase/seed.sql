@@ -140,7 +140,7 @@ VALUES
   (
     'socials',
     '{
-      "instagram": "https://instagram.com/gwdclub",
+      "instagram": "https://www.instagram.com/gwdclub.vjit/",
       "twitter": "https://twitter.com/gwdclub",
       "linkedin": "https://linkedin.com/company/gwdclub",
       "youtube": "https://youtube.com/@gwdclub",

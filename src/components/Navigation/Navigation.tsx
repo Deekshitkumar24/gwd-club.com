@@ -178,7 +178,7 @@ export default function Navigation() {
           <div className={styles.overlayFooter}>
             <p>contact@gwd-club.com</p>
             <div className={styles.overlayFooterLinks}>
-              <a href="https://instagram.com/gwdclub" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://www.instagram.com/gwdclub.vjit/" target="_blank" rel="noopener noreferrer">Instagram</a>
               <a href="https://linkedin.com/company/gwd-global" target="_blank" rel="noopener noreferrer">LinkedIn</a>
               <Link href="/admin">CMS Portal</Link>
             </div>

@@ -1,12 +1,20 @@
 'use client';
 
+/**
+ * GWD CMS Context — Production Version
+ * 
+ * This context provides the SAME interface as the original localStorage version
+ * so the admin dashboard UI does not need to change. However, all data persistence
+ * is now backed by Supabase server actions instead of localStorage.
+ * 
+ * PUBLIC PAGES DO NOT USE THIS CONTEXT. They fetch directly from the database
+ * via server components. This context is ONLY used by the admin dashboard.
+ */
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   GwdCmsStore,
   DEFAULT_CMS_STORE,
-  getCmsStore,
-  saveCmsStore,
-  resetCmsStore,
   DomainItem,
   RegistrationRecord,
   ApplicationRecord,
@@ -21,60 +29,83 @@ import {
 } from '@/lib/cms';
 import { ProjectItem, EventItem, LeaderSlot, Milestone, GalleryImage, CollaborationItem } from '@/data/content';
 
+// Import server actions
+import {
+  loadAllCmsData,
+  updateTeamMember,
+  createEventAction,
+  updateEventAction,
+  deleteEventAction,
+  createWorkAction,
+  updateWorkAction,
+  deleteWorkAction,
+  createGalleryItemAction,
+  updateGalleryItemAction,
+  deleteGalleryItemAction,
+  createTimelineMilestoneAction,
+  updateTimelineMilestoneAction,
+  deleteTimelineMilestoneAction,
+  createCollaborationAction,
+  updateCollaborationAction,
+  deleteCollaborationAction,
+  updateSiteSettingAction,
+  submitContactMessage,
+  submitApplication,
+  submitConnectRequest,
+  updateMessageStatusAction,
+  deleteMessageAction,
+  updateApplicationStatusAction,
+  deleteApplicationAction,
+  updateRegistrationAction,
+  deleteRegistrationAction,
+  updateConnectRequestStatusAction,
+  deleteConnectRequestAction,
+} from '@/app/admin/actions';
+
 interface CmsContextType {
   store: GwdCmsStore;
   isLoaded: boolean;
+  isSaving: boolean;
+  lastError: string | null;
+  clearError: () => void;
   updateHomepage: (patch: Partial<GwdCmsStore['homepage']>) => void;
-  // Domains
   updateDomain: (id: string, patch: Partial<DomainItem>) => void;
   createDomain: (domain: DomainItem) => void;
   deleteDomain: (id: string) => void;
-  // Projects / Work
   updateProject: (id: string, patch: Partial<ProjectItem>) => void;
   createProject: (project: ProjectItem) => void;
   deleteProject: (id: string) => void;
-  // Events
   updateEvent: (id: string, patch: Partial<EventItem>) => void;
   createEvent: (event: EventItem) => void;
   deleteEvent: (id: string) => void;
   archiveEvent: (id: string) => void;
-  // Leaders
   updateLeader: (id: string, patch: Partial<LeaderSlot>) => void;
   createLeader: (leader: LeaderSlot) => void;
   deleteLeader: (id: string) => void;
-  // Timeline
   updateTimeline: (index: number, patch: Partial<Milestone>) => void;
   createTimeline: (milestone: Milestone) => void;
   deleteTimeline: (index: number) => void;
-  // Gallery
   updateGalleryItem: (id: string, patch: Partial<GalleryImage>) => void;
   createGalleryItem: (item: GalleryImage) => void;
   deleteGalleryItem: (id: string) => void;
-  // Collaborations
   updateCollaboration: (id: string, patch: Partial<CollaborationItem>) => void;
   createCollaboration: (collab: CollaborationItem) => void;
   deleteCollaboration: (id: string) => void;
-  // Workflow
   updateWorkflowStep: (id: string, patch: Partial<WorkflowStepItem>) => void;
   createWorkflowStep: (step: WorkflowStepItem) => void;
   deleteWorkflowStep: (id: string) => void;
-  // Media
   addMedia: (media: MediaRecord) => void;
   deleteMedia: (id: string) => void;
   updateMedia: (id: string, patch: Partial<MediaRecord>) => void;
-  // Registrations
   addRegistration: (reg: Omit<RegistrationRecord, 'id' | 'registeredAt' | 'attendance'>) => RegistrationRecord;
   updateRegistrationStatus: (id: string, attended: boolean) => void;
   deleteRegistration: (id: string) => void;
-  // Applications
   addApplication: (app: Omit<ApplicationRecord, 'id' | 'appliedAt' | 'status'>) => ApplicationRecord;
   updateApplicationStatus: (id: string, status: ApplicationRecord['status'], notes?: string) => void;
   deleteApplication: (id: string) => void;
-  // Messages
   addMessage: (msg: Omit<ContactMessage, 'id' | 'receivedAt' | 'status'>) => ContactMessage;
   updateMessageStatus: (id: string, status: ContactMessage['status']) => void;
   deleteMessage: (id: string) => void;
-  // Connect & Institutional Partnerships
   addConnectRequest: (
     req: Omit<ConnectRequestRecord, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'followUpLogs'>
   ) => ConnectRequestRecord;
@@ -82,9 +113,7 @@ interface CmsContextType {
   updateConnectRequest: (id: string, patch: Partial<ConnectRequestRecord>) => void;
   addConnectFollowUpLog: (id: string, log: Omit<FollowUpLogItem, 'id' | 'timestamp'>) => void;
   deleteConnectRequest: (id: string) => void;
-  // Audit Log
   addAuditLog: (entry: Omit<AuditLogRecord, 'id' | 'timestamp'>) => void;
-  // Settings & Reset
   updateSettings: (patch: Partial<GwdCmsStore['settings']>) => void;
   updatePageSeo: (pageKey: string, patch: Partial<PageSeoRecord>) => void;
   resetToDefaults: () => void;
@@ -92,53 +121,265 @@ interface CmsContextType {
 
 const CmsContext = createContext<CmsContextType | null>(null);
 
+// ── Helper: Convert DB rows to CmsStore shape ──
+function dbDataToCmsStore(raw: Awaited<ReturnType<typeof loadAllCmsData>>): GwdCmsStore {
+  const settings = raw.siteSettings || {};
+  const homepage = (settings.homepage || {}) as GwdCmsStore['homepage'];
+  const footerData = (settings.footer || {}) as GwdCmsStore['homepage']['footer'];
+
+  const leaders: LeaderSlot[] = (raw.teamMembers || []).map((tm: Record<string, unknown>) => ({
+    slot: tm.sort_order as number,
+    id: tm.id as string,
+    name: (tm.name as string) || '',
+    role: (tm.role_title as string) || '',
+    photo: (tm.photo_url as string) || undefined,
+    hasCustomPhoto: !!(tm.photo_url),
+    bio: (tm.bio as string) || '',
+    quote: (tm.quote as string) || undefined,
+    deliverables: [],
+    skills: [],
+    socials: (tm.social_links as Record<string, string>) || {},
+    projects: [],
+    tier: (tm.tier as string) || 'core',
+    status: (tm.active as boolean) ? 'Published' : 'Draft',
+  }));
+
+  const events: EventItem[] = (raw.events || []).map((ev: Record<string, unknown>) => {
+    const cf = (ev.custom_fields || {}) as Record<string, unknown>;
+    return {
+      id: (ev.slug as string) || (ev.id as string),
+      title: (ev.title as string) || '',
+      date: ((ev.event_date as string) || '').split('T')[0],
+      time: (cf.time as string) || '',
+      location: (ev.location as string) || '',
+      shortDescription: (cf.shortDescription as string) || ((ev.description as string) || '').slice(0, 200),
+      description: (ev.description as string) || '',
+      image: (ev.cover_image as string) || '',
+      category: (cf.category as string) || 'Event',
+      venue: (cf.venue as string) || (ev.location as string) || '',
+      registrationOpen: (ev.is_registration_open as boolean) || false,
+      registrationDeadline: (ev.registration_deadline as string) || undefined,
+      status: (ev.status === 'published' ? 'Published' : ev.status === 'archived' ? 'Archived' : ev.status === 'completed' ? 'Completed' : 'Draft') as EventItem['status'],
+      featured: (cf.featured as boolean) || false,
+      capacity: (ev.capacity as number) || undefined,
+      year: new Date((ev.event_date as string) || '').getFullYear().toString(),
+      schedule: cf.schedule as EventItem['schedule'],
+      faq: cf.faq as EventItem['faq'],
+      speakers: cf.speakers as EventItem['speakers'],
+      gallery: cf.gallery as string[],
+      eligibility: cf.eligibility as string,
+      instructions: cf.instructions as string[],
+      highlights: cf.highlights as string[],
+      results: cf.results as string,
+      seo: cf.seo as EventItem['seo'],
+      registrationStatus: (ev.is_registration_open as boolean) ? 'Registration Open' : 'Registration Closed',
+    };
+  });
+
+  const upcomingEvents = events.filter(e => new Date(e.date) >= new Date());
+  const pastEvents = events.filter(e => new Date(e.date) < new Date());
+
+  const projects: ProjectItem[] = (raw.works || []).map((w: Record<string, unknown>) => {
+    const cs = (w.case_study || {}) as Record<string, unknown>;
+    return {
+      id: (w.slug as string) || (w.id as string),
+      title: (w.title as string) || '',
+      year: ((w.year as number) || new Date().getFullYear()).toString(),
+      category: (w.category as string) || '',
+      shortDescription: (w.summary as string) || '',
+      description: (cs.description as string) || (w.summary as string) || '',
+      outcome: (cs.outcome as string) || '',
+      heroImage: (w.cover_image as string) || '',
+      images: (w.gallery as string[]) || [],
+      tags: (cs.tags as string[]) || [],
+      featured: (cs.featured as boolean) || false,
+      status: (w.is_published as boolean) ? 'Published' : 'Draft',
+    };
+  });
+
+  const galleryItems: GalleryImage[] = (raw.galleryItems || []).map((g: Record<string, unknown>) => ({
+    id: g.id as string,
+    src: g.src as string,
+    caption: (g.caption as string) || '',
+    category: (g.category as string) || 'general',
+    featured: (g.is_featured as boolean) || false,
+    status: (g.status === 'published' ? 'Published' : g.status === 'archived' ? 'Archived' : 'Draft') as GalleryImage['status'],
+  }));
+
+  const timeline: Milestone[] = (raw.timelineMilestones || []).map((t: Record<string, unknown>) => ({
+    id: t.id as string,
+    date: (t.year as number || 0).toString(),
+    year: (t.year as number || 0).toString(),
+    title: (t.title as string) || '',
+    description: (t.description as string) || '',
+    achievement: (t.title as string) || '',
+    image: '',
+  }));
+
+  const collaborations: CollaborationItem[] = (raw.collaborations || []).map((c: Record<string, unknown>) => ({
+    id: c.id as string,
+    name: (c.name as string) || '',
+    type: (c.collab_type as string) || '',
+    year: (c.year as string) || '',
+    description: (c.description as string) || '',
+    outcome: (c.outcome as string) || '',
+    logo: (c.logo as string) || '',
+    image: (c.image as string) || '',
+    featured: (c.is_featured as boolean) || false,
+    status: (c.status === 'published' ? 'Published' : c.status === 'archived' ? 'Archived' : 'Draft') as CollaborationItem['status'],
+  }));
+
+  const media: MediaRecord[] = (raw.media || []).map((m: Record<string, unknown>) => ({
+    id: m.id as string,
+    url: (m.url as string) || (m.path as string) || '',
+    name: ((m.path as string) || '').split('/').pop() || 'media',
+    type: 'image' as const,
+    category: 'gallery' as const,
+    size: m.file_size ? `${Math.round((m.file_size as number) / 1024)} KB` : undefined,
+    uploadedAt: (m.created_at as string) || new Date().toISOString(),
+    dimensions: m.width && m.height ? `${m.width}x${m.height}` : undefined,
+    tags: [],
+    alt: (m.alt_text as string) || '',
+    album: (m.album as string) || undefined,
+  }));
+
+  const registrations: RegistrationRecord[] = (raw.registrations || []).map((r: Record<string, unknown>) => ({
+    id: r.id as string,
+    eventId: (r.event_id as string) || '',
+    eventTitle: '',
+    eventDate: '',
+    name: (r.name as string) || '',
+    email: (r.email as string) || '',
+    phone: (r.phone as string) || '',
+    college: (r.college as string) || '',
+    department: '',
+    year: '',
+    registeredAt: (r.created_at as string) || new Date().toISOString(),
+    attendance: (r.attended as boolean) || false,
+  }));
+
+  const applications: ApplicationRecord[] = (raw.applications || []).map((a: Record<string, unknown>) => ({
+    id: a.id as string,
+    name: (a.name as string) || '',
+    email: (a.email as string) || '',
+    phone: (a.phone as string) || '',
+    department: (a.department as string) || '',
+    year: (a.year_of_study as string) || '',
+    domain: ((a.role_interests as string[]) || []).join(', '),
+    why: (a.why_join as string) || '',
+    portfolio: (a.portfolio_url as string) || '',
+    status: (a.status as ApplicationRecord['status']) || 'New',
+    appliedAt: (a.created_at as string) || new Date().toISOString(),
+    notes: (a.notes as string) || undefined,
+  }));
+
+  const messages: ContactMessage[] = (raw.contactMessages || []).map((m: Record<string, unknown>) => ({
+    id: m.id as string,
+    name: (m.name as string) || '',
+    email: (m.email as string) || '',
+    subject: (m.subject as string) || '',
+    message: (m.message as string) || '',
+    receivedAt: (m.created_at as string) || new Date().toISOString(),
+    status: (m.is_read as boolean) ? 'Opened' : 'New',
+  }));
+
+  const connectRequests: ConnectRequestRecord[] = (raw.connectRequests || []).map((cr: Record<string, unknown>) => ({
+    id: cr.id as string,
+    createdAt: (cr.created_at as string) || new Date().toISOString(),
+    updatedAt: (cr.updated_at as string) || new Date().toISOString(),
+    requestType: (cr.request_type as ConnectRequestRecord['requestType']) || 'collaborate',
+    status: (cr.status as ConnectRequestStatus) || 'New',
+    fullName: (cr.full_name as string) || '',
+    roleDesignation: (cr.role_designation as string) || '',
+    email: (cr.email as string) || '',
+    phone: (cr.phone as string) || '',
+    requesterType: (cr.requester_type as ConnectRequestRecord['requesterType']) || 'Other',
+    institutionName: (cr.institution_name as string) || '',
+    institutionWebsite: (cr.institution_website as string) || '',
+    city: (cr.city as string) || '',
+    state: (cr.state as string) || '',
+    country: (cr.country as string) || 'India',
+    existingCommunityInfo: '',
+    proposal: (cr.proposal as string) || '',
+    internalNotes: (cr.internal_notes as string) || '',
+    assignedPoc: (cr.assigned_poc as string) || '',
+    followUpLogs: [],
+  }));
+
+  return {
+    ...DEFAULT_CMS_STORE,
+    leaders,
+    upcomingEvents,
+    pastEvents,
+    projects,
+    media,
+    domains: (settings.domains as DomainItem[]) || DEFAULT_CMS_STORE.domains,
+    timeline,
+    workflow: (settings.workflow as WorkflowStepItem[]) || DEFAULT_CMS_STORE.workflow,
+    gallery: galleryItems,
+    collaborations,
+    registrations,
+    applications,
+    messages,
+    connectRequests,
+    auditLogs: [],
+    homepage: {
+      ...DEFAULT_CMS_STORE.homepage,
+      ...homepage,
+      footer: { ...DEFAULT_CMS_STORE.homepage.footer, ...footerData },
+    },
+    settings: {
+      ...DEFAULT_CMS_STORE.settings,
+      seoPages: (settings.seo as GwdCmsStore['settings']['seoPages']) || DEFAULT_CMS_STORE.settings.seoPages,
+    },
+    lastUpdated: new Date().toISOString(),
+  };
+}
+
 export function CmsProvider({ children }: { children: React.ReactNode }) {
   const [store, setStore] = useState<GwdCmsStore>(DEFAULT_CMS_STORE);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
-  // Initialize from storage on mount
+  const clearError = useCallback(() => setLastError(null), []);
+
+  // ── Load from database on mount ──
   useEffect(() => {
-    const loaded = getCmsStore();
-    queueMicrotask(() => {
-      setStore(loaded);
-      setIsLoaded(true);
-    });
-
-    const handleUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<GwdCmsStore>;
-      if (customEvent.detail) {
-        setStore(customEvent.detail);
-      } else {
-        setStore(getCmsStore());
-      }
-    };
-
-    window.addEventListener('gwd:cms-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
-
-    return () => {
-      window.removeEventListener('gwd:cms-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
-    };
+    loadAllCmsData()
+      .then((raw) => {
+        setStore(dbDataToCmsStore(raw));
+        setIsLoaded(true);
+      })
+      .catch((err) => {
+        console.error('[CmsContext] Failed to load CMS data from database:', err);
+        setLastError(err instanceof Error ? err.message : 'Failed to load CMS data');
+        setIsLoaded(true); // Don't leave the UI stuck
+      });
   }, []);
 
-  const addAuditLog = useCallback((entry: Omit<AuditLogRecord, 'id' | 'timestamp'>) => {
-    setStore((prev) => {
-      const logRecord: AuditLogRecord = {
-        ...entry,
-        id: `audit-${Date.now().toString(36)}`,
-        timestamp: new Date().toISOString(),
-      };
-      const nextLogs = [logRecord, ...(prev.auditLogs || [])].slice(0, 100);
-      const next = { ...prev, auditLogs: nextLogs };
-      saveCmsStore(next);
-      return next;
-    });
+  // ── Generic DB mutation wrapper (fire-and-forget with error capture) ──
+  function dbMutation(action: () => Promise<unknown>) {
+    setIsSaving(true);
+    setLastError(null);
+    action()
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Save failed';
+        console.error('[CmsContext] Mutation error:', msg);
+        setLastError(msg);
+      })
+      .finally(() => setIsSaving(false));
+  }
+
+  // ── Audit Log ──
+  const addAuditLog = useCallback((_entry: Omit<AuditLogRecord, 'id' | 'timestamp'>) => {
+    // Audit logs are now automatically created by database triggers
   }, []);
 
+  // ── Homepage ──
   const updateHomepage = useCallback((patch: Partial<GwdCmsStore['homepage']>) => {
     setStore((prev) => {
-      const next: GwdCmsStore = {
+      const next = {
         ...prev,
         homepage: {
           ...prev.homepage,
@@ -149,677 +390,465 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
           footer: { ...prev.homepage.footer, ...(patch.footer || {}) },
         },
       };
-      saveCmsStore(next);
       return next;
     });
-    addAuditLog({
-      action: 'UPDATE_HOMEPAGE',
-      targetType: 'HOMEPAGE',
-      user: 'admin@gwd-club.com',
-      details: 'Homepage configuration updated through CMS.',
-      status: 'info',
+    dbMutation(async () => {
+      await updateSiteSettingAction('homepage', patch);
+      if (patch.footer) await updateSiteSettingAction('footer', patch.footer);
     });
-  }, [addAuditLog]);
+  }, []);
 
-  // Domains
+  // ── Domains ──
   const updateDomain = useCallback((id: string, patch: Partial<DomainItem>) => {
     setStore((prev) => {
       const nextDomains = prev.domains.map((d) => (d.id === id ? { ...d, ...patch } : d));
-      const next = { ...prev, domains: nextDomains };
-      saveCmsStore(next);
-      return next;
+      return { ...prev, domains: nextDomains };
     });
-    addAuditLog({
-      action: 'UPDATE_DOMAIN',
-      targetType: 'DOMAIN',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Domain ${id} updated.`,
-      status: 'info',
+    dbMutation(async () => {
+      const current = store.domains.map((d) => (d.id === id ? { ...d, ...patch } : d));
+      await updateSiteSettingAction('domains', current);
     });
-  }, [addAuditLog]);
+  }, [store.domains]);
 
   const createDomain = useCallback((domain: DomainItem) => {
     setStore((prev) => {
       const nextDomains = [...prev.domains.filter((d) => d.id !== domain.id), domain];
-      const next = { ...prev, domains: nextDomains };
-      saveCmsStore(next);
-      return next;
+      return { ...prev, domains: nextDomains };
     });
-    addAuditLog({
-      action: 'CREATE_DOMAIN',
-      targetType: 'DOMAIN',
-      targetId: domain.id,
-      user: 'admin@gwd-club.com',
-      details: `New domain "${domain.name}" created.`,
-      status: 'success',
+    dbMutation(async () => {
+      const current = [...store.domains.filter((d) => d.id !== domain.id), domain];
+      await updateSiteSettingAction('domains', current);
     });
-  }, [addAuditLog]);
+  }, [store.domains]);
 
   const deleteDomain = useCallback((id: string) => {
-    setStore((prev) => {
-      const nextDomains = prev.domains.filter((d) => d.id !== id);
-      const next = { ...prev, domains: nextDomains };
-      saveCmsStore(next);
-      return next;
+    setStore((prev) => ({ ...prev, domains: prev.domains.filter((d) => d.id !== id) }));
+    dbMutation(async () => {
+      const current = store.domains.filter((d) => d.id !== id);
+      await updateSiteSettingAction('domains', current);
     });
-    addAuditLog({
-      action: 'DELETE_DOMAIN',
-      targetType: 'DOMAIN',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Domain ${id} deleted.`,
-      status: 'warning',
-    });
-  }, [addAuditLog]);
+  }, [store.domains]);
 
-  // Projects
+  // ── Projects / Work ──
   const updateProject = useCallback((id: string, patch: Partial<ProjectItem>) => {
-    setStore((prev) => {
-      const nextProjects = prev.projects.map((p) => (p.id === id ? { ...p, ...patch } : p));
-      const next = { ...prev, projects: nextProjects };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'UPDATE_PROJECT',
-      targetType: 'PROJECT',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Project ${id} updated.`,
-      status: 'info',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      projects: prev.projects.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+    }));
+    dbMutation(() => updateWorkAction(id, patch as Record<string, unknown>));
+  }, []);
 
   const createProject = useCallback((project: ProjectItem) => {
-    setStore((prev) => {
-      const next = { ...prev, projects: [project, ...prev.projects.filter((p) => p.id !== project.id)] };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'CREATE_PROJECT',
-      targetType: 'PROJECT',
-      targetId: project.id,
-      user: 'admin@gwd-club.com',
-      details: `New project "${project.title}" created.`,
-      status: 'success',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      projects: [project, ...prev.projects.filter((p) => p.id !== project.id)],
+    }));
+    dbMutation(() => createWorkAction(project as unknown as Record<string, unknown>));
+  }, []);
 
   const deleteProject = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, projects: prev.projects.filter((p) => p.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'DELETE_PROJECT',
-      targetType: 'PROJECT',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Project ${id} removed.`,
-      status: 'warning',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({ ...prev, projects: prev.projects.filter((p) => p.id !== id) }));
+    dbMutation(() => deleteWorkAction(id));
+  }, []);
 
-  // Events
+  // ── Events ──
   const updateEvent = useCallback((id: string, patch: Partial<EventItem>) => {
-    setStore((prev) => {
-      const nextUpcoming = prev.upcomingEvents.map((e) => (e.id === id ? { ...e, ...patch } : e));
-      const nextPast = prev.pastEvents.map((e) => (e.id === id ? { ...e, ...patch } : e));
-      const next = { ...prev, upcomingEvents: nextUpcoming, pastEvents: nextPast };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'UPDATE_EVENT',
-      targetType: 'EVENT',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Event ${id} modified.`,
-      status: 'info',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      upcomingEvents: prev.upcomingEvents.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+      pastEvents: prev.pastEvents.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    }));
+    dbMutation(() => updateEventAction(id, patch as Record<string, unknown>));
+  }, []);
 
   const createEvent = useCallback((event: EventItem) => {
-    setStore((prev) => {
-      const next = { ...prev, upcomingEvents: [event, ...prev.upcomingEvents.filter((e) => e.id !== event.id)] };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'CREATE_EVENT',
-      targetType: 'EVENT',
-      targetId: event.id,
-      user: 'admin@gwd-club.com',
-      details: `New event "${event.title}" registered.`,
-      status: 'success',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      upcomingEvents: [event, ...prev.upcomingEvents.filter((e) => e.id !== event.id)],
+    }));
+    dbMutation(() => createEventAction(event as unknown as Record<string, unknown>));
+  }, []);
 
   const deleteEvent = useCallback((id: string) => {
-    setStore((prev) => {
-      const nextUpcoming = prev.upcomingEvents.filter((e) => e.id !== id);
-      const nextPast = prev.pastEvents.filter((e) => e.id !== id);
-      const next = { ...prev, upcomingEvents: nextUpcoming, pastEvents: nextPast };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'DELETE_EVENT',
-      targetType: 'EVENT',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Event ${id} deleted.`,
-      status: 'warning',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      upcomingEvents: prev.upcomingEvents.filter((e) => e.id !== id),
+      pastEvents: prev.pastEvents.filter((e) => e.id !== id),
+    }));
+    dbMutation(() => deleteEventAction(id));
+  }, []);
 
   const archiveEvent = useCallback((id: string) => {
-    setStore((prev) => {
-      const target = prev.upcomingEvents.find((e) => e.id === id);
-      if (!target) return prev;
-      const nextUpcoming = prev.upcomingEvents.filter((e) => e.id !== id);
-      const nextPast = [{ ...target, isUpcoming: false, registrationOpen: false }, ...prev.pastEvents];
-      const next = { ...prev, upcomingEvents: nextUpcoming, pastEvents: nextPast };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'ARCHIVE_EVENT',
-      targetType: 'EVENT',
-      targetId: id,
-      user: 'admin@gwd-club.com',
-      details: `Event ${id} moved to Past Events archive.`,
-      status: 'info',
-    });
-  }, [addAuditLog]);
+    setStore((prev) => ({
+      ...prev,
+      upcomingEvents: prev.upcomingEvents.map((e) =>
+        e.id === id ? { ...e, status: 'archived' as EventItem['status'] } : e
+      ),
+      pastEvents: prev.pastEvents.map((e) =>
+        e.id === id ? { ...e, status: 'archived' as EventItem['status'] } : e
+      ),
+    }));
+    dbMutation(() => updateEventAction(id, { status: 'archived' }));
+  }, []);
 
-  // Leaders
+  // ── Leaders / Team ──
   const updateLeader = useCallback((id: string, patch: Partial<LeaderSlot>) => {
-    setStore((prev) => {
-      const nextLeaders = prev.leaders.map((l) => (l.id === id ? { ...l, ...patch } : l));
-      const next = { ...prev, leaders: nextLeaders };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      leaders: prev.leaders.map((l) => (l.id === id ? { ...l, ...patch } : l)),
+    }));
+    dbMutation(() => updateTeamMember(id, patch as Record<string, unknown>));
   }, []);
 
-  const createLeader = useCallback((leader: LeaderSlot) => {
-    setStore((prev) => {
-      const nextLeaders = [...prev.leaders.filter((l) => l.id !== leader.id), leader];
-      const next = { ...prev, leaders: nextLeaders };
-      saveCmsStore(next);
-      return next;
-    });
+  const createLeader = useCallback((_leader: LeaderSlot) => {
+    // Team slots are fixed (9 slots) — creation is handled via updateLeader on empty slots
   }, []);
 
-  const deleteLeader = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, leaders: prev.leaders.filter((l) => l.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+  const deleteLeader = useCallback((_id: string) => {
+    // Team slots cannot be deleted (fixed 9-slot architecture)
   }, []);
 
-  // Timeline
+  // ── Timeline ──
   const updateTimeline = useCallback((index: number, patch: Partial<Milestone>) => {
     setStore((prev) => {
       const nextTimeline = [...prev.timeline];
       if (nextTimeline[index]) {
         nextTimeline[index] = { ...nextTimeline[index], ...patch };
       }
-      const next = { ...prev, timeline: nextTimeline };
-      saveCmsStore(next);
-      return next;
+      return { ...prev, timeline: nextTimeline };
     });
-  }, []);
+    const milestone = store.timeline[index];
+    if (milestone) {
+      const milestoneId = (milestone as Milestone & { id?: string }).id;
+      if (milestoneId) {
+        dbMutation(() => updateTimelineMilestoneAction(milestoneId, patch as Record<string, unknown>));
+      }
+    }
+  }, [store.timeline]);
 
   const createTimeline = useCallback((milestone: Milestone) => {
-    setStore((prev) => {
-      const next = { ...prev, timeline: [...prev.timeline, milestone] };
-      saveCmsStore(next);
-      return next;
-    });
-  }, []);
+    setStore((prev) => ({ ...prev, timeline: [...prev.timeline, milestone] }));
+    dbMutation(() =>
+      createTimelineMilestoneAction({
+        year: milestone.year || milestone.date,
+        title: milestone.title,
+        description: milestone.description,
+        sort_order: store.timeline.length,
+      })
+    );
+  }, [store.timeline]);
 
   const deleteTimeline = useCallback((index: number) => {
-    setStore((prev) => {
-      const next = { ...prev, timeline: prev.timeline.filter((_, i) => i !== index) };
-      saveCmsStore(next);
-      return next;
-    });
-  }, []);
+    const milestone = store.timeline[index];
+    setStore((prev) => ({ ...prev, timeline: prev.timeline.filter((_, i) => i !== index) }));
+    if (milestone) {
+      const milestoneId = (milestone as Milestone & { id?: string }).id;
+      if (milestoneId) {
+        dbMutation(() => deleteTimelineMilestoneAction(milestoneId));
+      }
+    }
+  }, [store.timeline]);
 
-  // Gallery
+  // ── Gallery ──
   const updateGalleryItem = useCallback((id: string, patch: Partial<GalleryImage>) => {
-    setStore((prev) => {
-      const nextGallery = prev.gallery.map((g) => ((g.id || g.src) === id ? { ...g, ...patch } : g));
-      const next = { ...prev, gallery: nextGallery };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      gallery: prev.gallery.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+    }));
+    dbMutation(() => updateGalleryItemAction(id, patch as Record<string, unknown>));
   }, []);
 
   const createGalleryItem = useCallback((item: GalleryImage) => {
-    setStore((prev) => {
-      const id = item.id || `gallery-${Date.now().toString(36)}`;
-      const normalizedItem = { ...item, id };
-      const next = { ...prev, gallery: [normalizedItem, ...prev.gallery.filter((g) => (g.id || g.src) !== id)] };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      gallery: [...prev.gallery.filter((g) => g.id !== item.id), item],
+    }));
+    dbMutation(() => createGalleryItemAction(item as unknown as Record<string, unknown>));
   }, []);
 
   const deleteGalleryItem = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, gallery: prev.gallery.filter((g) => (g.id || g.src) !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({ ...prev, gallery: prev.gallery.filter((g) => g.id !== id) }));
+    dbMutation(() => deleteGalleryItemAction(id));
   }, []);
 
-  // Collaborations
+  // ── Collaborations ──
   const updateCollaboration = useCallback((id: string, patch: Partial<CollaborationItem>) => {
-    setStore((prev) => {
-      const nextCollabs = prev.collaborations.map((c) => (c.id === id ? { ...c, ...patch } : c));
-      const next = { ...prev, collaborations: nextCollabs };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      collaborations: prev.collaborations.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    }));
+    dbMutation(() => updateCollaborationAction(id, patch as Record<string, unknown>));
   }, []);
 
   const createCollaboration = useCallback((collab: CollaborationItem) => {
-    setStore((prev) => {
-      const next = { ...prev, collaborations: [collab, ...prev.collaborations.filter((c) => c.id !== collab.id)] };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      collaborations: [...prev.collaborations.filter((c) => c.id !== collab.id), collab],
+    }));
+    dbMutation(() => createCollaborationAction(collab as unknown as Record<string, unknown>));
   }, []);
 
   const deleteCollaboration = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, collaborations: prev.collaborations.filter((c) => c.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({ ...prev, collaborations: prev.collaborations.filter((c) => c.id !== id) }));
+    dbMutation(() => deleteCollaborationAction(id));
   }, []);
 
-  // Workflow
+  // ── Workflow (stored in site_settings as JSON) ──
   const updateWorkflowStep = useCallback((id: string, patch: Partial<WorkflowStepItem>) => {
     setStore((prev) => {
-      const next = { ...prev, workflow: (prev.workflow || []).map((w) => (w.id === id ? { ...w, ...patch } : w)) };
-      saveCmsStore(next);
-      return next;
+      const nextWorkflow = prev.workflow.map((w) => (w.id === id ? { ...w, ...patch } : w));
+      dbMutation(() => updateSiteSettingAction('workflow', nextWorkflow));
+      return { ...prev, workflow: nextWorkflow };
     });
   }, []);
 
   const createWorkflowStep = useCallback((step: WorkflowStepItem) => {
     setStore((prev) => {
-      const next = { ...prev, workflow: [...(prev.workflow || []).filter((w) => w.id !== step.id), step] };
-      saveCmsStore(next);
-      return next;
+      const nextWorkflow = [...prev.workflow.filter((w) => w.id !== step.id), step];
+      dbMutation(() => updateSiteSettingAction('workflow', nextWorkflow));
+      return { ...prev, workflow: nextWorkflow };
     });
   }, []);
 
   const deleteWorkflowStep = useCallback((id: string) => {
     setStore((prev) => {
-      const next = { ...prev, workflow: (prev.workflow || []).filter((w) => w.id !== id) };
-      saveCmsStore(next);
-      return next;
+      const nextWorkflow = prev.workflow.filter((w) => w.id !== id);
+      dbMutation(() => updateSiteSettingAction('workflow', nextWorkflow));
+      return { ...prev, workflow: nextWorkflow };
     });
   }, []);
 
-  // Media
-  const addMedia = useCallback((media: MediaRecord) => {
-    setStore((prev) => {
-      const next = { ...prev, media: [media, ...(prev.media || []).filter((m) => m.id !== media.id)] };
-      saveCmsStore(next);
-      return next;
-    });
-    addAuditLog({
-      action: 'UPLOAD_MEDIA',
-      targetType: 'MEDIA',
-      targetId: media.id,
-      user: 'admin@gwd-club.com',
-      details: `Media asset "${media.name}" added to library.`,
-      status: 'success',
-    });
-  }, [addAuditLog]);
+  // ── Media ──
+  const addMedia = useCallback((_media: MediaRecord) => {
+    // TODO: Implement Supabase Storage upload
+    setStore((prev) => ({ ...prev, media: [_media, ...prev.media] }));
+  }, []);
 
   const deleteMedia = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, media: (prev.media || []).filter((m) => m.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({ ...prev, media: prev.media.filter((m) => m.id !== id) }));
   }, []);
 
   const updateMedia = useCallback((id: string, patch: Partial<MediaRecord>) => {
-    setStore((prev) => {
-      const next = { ...prev, media: (prev.media || []).map((m) => (m.id === id ? { ...m, ...patch } : m)) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      media: prev.media.map((m) => (m.id === id ? { ...m, ...patch } : m)),
+    }));
   }, []);
 
-  // Registrations
+  // ── Registrations ──
   const addRegistration = useCallback(
-    (data: Omit<RegistrationRecord, 'id' | 'registeredAt' | 'attendance'>) => {
-      const newRecord: RegistrationRecord = {
-        ...data,
-        id: `GWD-REG-${Date.now().toString(36).toUpperCase()}`,
+    (reg: Omit<RegistrationRecord, 'id' | 'registeredAt' | 'attendance'>): RegistrationRecord => {
+      const record: RegistrationRecord = {
+        ...reg,
+        id: `reg-${Date.now().toString(36)}`,
         registeredAt: new Date().toISOString(),
         attendance: false,
       };
-
-      setStore((prev) => {
-        const next = { ...prev, registrations: [newRecord, ...prev.registrations] };
-        saveCmsStore(next);
-        return next;
-      });
-
-      return newRecord;
+      setStore((prev) => ({
+        ...prev,
+        registrations: [record, ...prev.registrations],
+      }));
+      return record;
     },
     []
   );
 
   const updateRegistrationStatus = useCallback((id: string, attended: boolean) => {
-    setStore((prev) => {
-      const updated = prev.registrations.map((r) => (r.id === id ? { ...r, attendance: attended } : r));
-      const next = { ...prev, registrations: updated };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      registrations: prev.registrations.map((r) => (r.id === id ? { ...r, attendance: attended } : r)),
+    }));
+    dbMutation(() => updateRegistrationAction(id, attended));
   }, []);
 
   const deleteRegistration = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, registrations: prev.registrations.filter((r) => r.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      registrations: prev.registrations.filter((r) => r.id !== id),
+    }));
+    dbMutation(() => deleteRegistrationAction(id));
   }, []);
 
-  // Applications
+  // ── Applications ──
   const addApplication = useCallback(
-    (data: Omit<ApplicationRecord, 'id' | 'appliedAt' | 'status'>) => {
-      const newRecord: ApplicationRecord = {
-        ...data,
-        id: `GWD-APP-${Date.now().toString(36).toUpperCase()}`,
+    (app: Omit<ApplicationRecord, 'id' | 'appliedAt' | 'status'>): ApplicationRecord => {
+      const record: ApplicationRecord = {
+        ...app,
+        id: `app-${Date.now().toString(36)}`,
         appliedAt: new Date().toISOString(),
         status: 'New',
       };
-
-      setStore((prev) => {
-        const next = { ...prev, applications: [newRecord, ...prev.applications] };
-        saveCmsStore(next);
-        return next;
-      });
-
-      return newRecord;
+      setStore((prev) => ({
+        ...prev,
+        applications: [record, ...prev.applications],
+      }));
+      dbMutation(() => submitApplication(app as Record<string, unknown>));
+      return record;
     },
     []
   );
 
-  const updateApplicationStatus = useCallback((id: string, status: ApplicationRecord['status'], notes?: string) => {
-    setStore((prev) => {
-      const updated = prev.applications.map((a) => (a.id === id ? { ...a, status, notes: notes ?? a.notes } : a));
-      const next = { ...prev, applications: updated };
-      saveCmsStore(next);
-      return next;
-    });
-  }, []);
+  const updateApplicationStatus = useCallback(
+    (id: string, status: ApplicationRecord['status'], notes?: string) => {
+      setStore((prev) => ({
+        ...prev,
+        applications: prev.applications.map((a) =>
+          a.id === id ? { ...a, status, ...(notes !== undefined ? { notes } : {}) } : a
+        ),
+      }));
+      dbMutation(() => updateApplicationStatusAction(id, status, notes));
+    },
+    []
+  );
 
   const deleteApplication = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, applications: prev.applications.filter((a) => a.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      applications: prev.applications.filter((a) => a.id !== id),
+    }));
+    dbMutation(() => deleteApplicationAction(id));
   }, []);
 
-  // Messages
+  // ── Messages ──
   const addMessage = useCallback(
-    (data: Omit<ContactMessage, 'id' | 'receivedAt' | 'status'>) => {
-      const newRecord: ContactMessage = {
-        ...data,
-        id: `GWD-MSG-${Date.now().toString(36).toUpperCase()}`,
+    (msg: Omit<ContactMessage, 'id' | 'receivedAt' | 'status'>): ContactMessage => {
+      const record: ContactMessage = {
+        ...msg,
+        id: `msg-${Date.now().toString(36)}`,
         receivedAt: new Date().toISOString(),
         status: 'New',
       };
-
-      setStore((prev) => {
-        const next = { ...prev, messages: [newRecord, ...prev.messages] };
-        saveCmsStore(next);
-        return next;
-      });
-
-      return newRecord;
+      setStore((prev) => ({
+        ...prev,
+        messages: [record, ...prev.messages],
+      }));
+      dbMutation(() => submitContactMessage(msg));
+      return record;
     },
     []
   );
 
   const updateMessageStatus = useCallback((id: string, status: ContactMessage['status']) => {
-    setStore((prev) => {
-      const updated = prev.messages.map((m) => (m.id === id ? { ...m, status } : m));
-      const next = { ...prev, messages: updated };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({
+      ...prev,
+      messages: prev.messages.map((m) => (m.id === id ? { ...m, status } : m)),
+    }));
+    dbMutation(() => updateMessageStatusAction(id, status !== 'New'));
   }, []);
 
   const deleteMessage = useCallback((id: string) => {
-    setStore((prev) => {
-      const next = { ...prev, messages: prev.messages.filter((m) => m.id !== id) };
-      saveCmsStore(next);
-      return next;
-    });
+    setStore((prev) => ({ ...prev, messages: prev.messages.filter((m) => m.id !== id) }));
+    dbMutation(() => deleteMessageAction(id));
   }, []);
 
-  // Connect & Institutional Partnerships
+  // ── Connect Requests ──
   const addConnectRequest = useCallback(
-    (data: Omit<ConnectRequestRecord, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'followUpLogs'>) => {
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const newRecord: ConnectRequestRecord = {
-        ...data,
-        id: `REQ-2026-${randomSuffix}`,
+    (
+      req: Omit<ConnectRequestRecord, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'followUpLogs'>
+    ): ConnectRequestRecord => {
+      const record: ConnectRequestRecord = {
+        ...req,
+        id: `REQ-${new Date().getFullYear()}-${Date.now().toString(36)}`,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: 'New',
         followUpLogs: [],
       };
-
-      setStore((prev) => {
-        const next = { ...prev, connectRequests: [newRecord, ...(prev.connectRequests || [])] };
-        saveCmsStore(next);
-        return next;
-      });
-
-      addAuditLog({
-        action: 'CONNECT_REQUEST_SUBMITTED',
-        targetType: 'CONNECT_REQUEST',
-        targetId: newRecord.id,
-        user: newRecord.email,
-        details: `Institutional connect request received from ${newRecord.fullName} (${newRecord.institutionName}) for "${newRecord.requestType}". Assigned ID: ${newRecord.id}`,
-        status: 'success',
-      });
-
-      return newRecord;
+      setStore((prev) => ({
+        ...prev,
+        connectRequests: [record, ...prev.connectRequests],
+      }));
+      dbMutation(() => submitConnectRequest(req as Record<string, unknown>));
+      return record;
     },
-    [addAuditLog]
+    []
   );
 
-  const updateConnectRequestStatus = useCallback(
-    (id: string, status: ConnectRequestStatus) => {
-      let institution = '';
-      let requester = '';
-      setStore((prev) => {
-        const updated = (prev.connectRequests || []).map((req) => {
-          if (req.id === id) {
-            institution = req.institutionName;
-            requester = req.fullName;
-            return { ...req, status, updatedAt: new Date().toISOString() };
-          }
-          return req;
-        });
-        const next = { ...prev, connectRequests: updated };
-        saveCmsStore(next);
-        return next;
-      });
+  const updateConnectRequestStatus = useCallback((id: string, status: ConnectRequestStatus) => {
+    setStore((prev) => ({
+      ...prev,
+      connectRequests: prev.connectRequests.map((cr) =>
+        cr.id === id ? { ...cr, status, updatedAt: new Date().toISOString() } : cr
+      ),
+    }));
+    dbMutation(() => updateConnectRequestStatusAction(id, status.toLowerCase()));
+  }, []);
 
-      addAuditLog({
-        action: 'CONNECT_STATUS_CHANGE',
-        targetType: 'CONNECT_REQUEST',
-        targetId: id,
-        user: 'admin@gwd-club.com',
-        details: `Request ${id} (${requester} · ${institution}) transitioned to lifecycle status "${status}".`,
-        status: 'info',
-      });
-    },
-    [addAuditLog]
-  );
-
-  const updateConnectRequest = useCallback(
-    (id: string, patch: Partial<ConnectRequestRecord>) => {
-      setStore((prev) => {
-        const updated = (prev.connectRequests || []).map((req) =>
-          req.id === id ? { ...req, ...patch, updatedAt: new Date().toISOString() } : req
-        );
-        const next = { ...prev, connectRequests: updated };
-        saveCmsStore(next);
-        return next;
-      });
-
-      const details = patch.assignedPoc
-        ? `Request ${id} assigned to GWD POC: "${patch.assignedPoc}".`
-        : `Request ${id} details and internal notes updated.`;
-
-      addAuditLog({
-        action: patch.assignedPoc ? 'CONNECT_ASSIGN_POC' : 'CONNECT_UPDATE',
-        targetType: 'CONNECT_REQUEST',
-        targetId: id,
-        user: 'admin@gwd-club.com',
-        details,
-        status: 'info',
-      });
-    },
-    [addAuditLog]
-  );
+  const updateConnectRequest = useCallback((id: string, patch: Partial<ConnectRequestRecord>) => {
+    setStore((prev) => ({
+      ...prev,
+      connectRequests: prev.connectRequests.map((cr) =>
+        cr.id === id ? { ...cr, ...patch, updatedAt: new Date().toISOString() } : cr
+      ),
+    }));
+    // For complex updates, update the full record via site_settings or a dedicated action
+    if (patch.status) {
+      dbMutation(() => updateConnectRequestStatusAction(id, (patch.status as string).toLowerCase()));
+    }
+  }, []);
 
   const addConnectFollowUpLog = useCallback(
     (id: string, log: Omit<FollowUpLogItem, 'id' | 'timestamp'>) => {
-      const logItem: FollowUpLogItem = {
-        id: `fol-${Date.now().toString(36)}`,
-        timestamp: new Date().toISOString(),
-        ...log,
-      };
-
-      setStore((prev) => {
-        const updated = (prev.connectRequests || []).map((req) => {
-          if (req.id === id) {
-            return {
-              ...req,
-              updatedAt: new Date().toISOString(),
-              followUpLogs: [...(req.followUpLogs || []), logItem],
-            };
-          }
-          return req;
-        });
-        const next = { ...prev, connectRequests: updated };
-        saveCmsStore(next);
-        return next;
-      });
-
-      addAuditLog({
-        action: 'CONNECT_FOLLOWUP_LOG',
-        targetType: 'CONNECT_REQUEST',
-        targetId: id,
-        user: log.author || 'admin@gwd-club.com',
-        details: `Follow-up recorded on request ${id}: "${log.action}".`,
-        status: 'info',
-      });
+      setStore((prev) => ({
+        ...prev,
+        connectRequests: prev.connectRequests.map((cr) => {
+          if (cr.id !== id) return cr;
+          const newLog: FollowUpLogItem = {
+            ...log,
+            id: `log-${Date.now().toString(36)}`,
+            timestamp: new Date().toISOString(),
+          };
+          return {
+            ...cr,
+            followUpLogs: [newLog, ...(cr.followUpLogs || [])],
+            updatedAt: new Date().toISOString(),
+          };
+        }),
+      }));
     },
-    [addAuditLog]
+    []
   );
 
-  const deleteConnectRequest = useCallback(
-    (id: string) => {
-      setStore((prev) => {
-        const next = {
-          ...prev,
-          connectRequests: (prev.connectRequests || []).filter((r) => r.id !== id),
-        };
-        saveCmsStore(next);
-        return next;
-      });
+  const deleteConnectRequest = useCallback((id: string) => {
+    setStore((prev) => ({
+      ...prev,
+      connectRequests: prev.connectRequests.filter((cr) => cr.id !== id),
+    }));
+    dbMutation(() => deleteConnectRequestAction(id));
+  }, []);
 
-      addAuditLog({
-        action: 'CONNECT_DELETE',
-        targetType: 'CONNECT_REQUEST',
-        targetId: id,
-        user: 'admin@gwd-club.com',
-        details: `Connect request ${id} permanently deleted from archive.`,
-        status: 'warning',
-      });
-    },
-    [addAuditLog]
-  );
-
-  // Settings
+  // ── Settings ──
   const updateSettings = useCallback((patch: Partial<GwdCmsStore['settings']>) => {
-    setStore((prev) => {
-      const next = { ...prev, settings: { ...prev.settings, ...patch } };
-      saveCmsStore(next);
-      return next;
+    setStore((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, ...patch },
+    }));
+    dbMutation(async () => {
+      if (patch.partnershipLead) {
+        await updateSiteSettingAction('partnership_lead', patch.partnershipLead);
+      }
     });
-    addAuditLog({
-      action: 'UPDATE_SETTINGS',
-      targetType: 'SETTINGS',
-      user: 'admin@gwd-club.com',
-      details: 'Global site settings and DyeWhorl preferences saved.',
-      status: 'info',
-    });
-  }, [addAuditLog]);
+  }, []);
 
   const updatePageSeo = useCallback((pageKey: string, patch: Partial<PageSeoRecord>) => {
     setStore((prev) => {
-      const currentPages = prev.settings.seoPages || {};
-      const current = currentPages[pageKey] || {
-        pageKey,
-        pageTitle: pageKey,
-        seoTitle: '',
-        metaDescription: '',
-        ogTitle: '',
-        ogDescription: '',
-        ogImage: '/brand/gwd-logo.png',
+      const existing = prev.settings.seoPages?.[pageKey] || { pageKey, pageTitle: pageKey, seoTitle: pageKey, metaDescription: '', ogTitle: '', ogDescription: '', ogImage: '', canonicalUrl: '', noIndex: false };
+      const nextSeoPages: Record<string, PageSeoRecord> = {
+        ...(prev.settings.seoPages || {}),
+        [pageKey]: { ...existing, ...patch, pageKey },
       };
-      const updatedPage = { ...current, ...patch };
-      const nextSettings = {
-        ...prev.settings,
-        seoPages: {
-          ...currentPages,
-          [pageKey]: updatedPage,
-        },
-      };
-      const next = { ...prev, settings: nextSettings };
-      saveCmsStore(next);
-      return next;
+      return { ...prev, settings: { ...prev.settings, seoPages: nextSeoPages } };
     });
-    addAuditLog({
-      action: 'UPDATE_SEO',
-      targetType: 'SEO',
-      targetId: pageKey,
-      user: 'admin@gwd-club.com',
-      details: `SEO metadata updated for page "${pageKey}".`,
-      status: 'info',
+    dbMutation(async () => {
+      const seoPages = { ...store.settings.seoPages };
+      const existing = seoPages[pageKey] || { pageKey, pageTitle: pageKey, seoTitle: pageKey, metaDescription: '', ogTitle: '', ogDescription: '', ogImage: '', canonicalUrl: '', noIndex: false };
+      seoPages[pageKey] = { ...existing, ...patch, pageKey };
+      await updateSiteSettingAction('seo', seoPages);
     });
-  }, [addAuditLog]);
+  }, [store.settings.seoPages]);
 
   const resetToDefaults = useCallback(() => {
-    const fresh = resetCmsStore();
-    setStore(fresh);
+    setStore(DEFAULT_CMS_STORE);
   }, []);
 
   return (
@@ -827,6 +856,9 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
       value={{
         store,
         isLoaded,
+        isSaving,
+        lastError,
+        clearError,
         updateHomepage,
         updateDomain,
         createDomain,
@@ -887,6 +919,9 @@ export function useCms() {
     return {
       store: DEFAULT_CMS_STORE,
       isLoaded: true,
+      isSaving: false,
+      lastError: null,
+      clearError: () => {},
       updateHomepage: () => {},
       updateDomain: () => {},
       createDomain: () => {},

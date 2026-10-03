@@ -54,7 +54,7 @@ export const CLUB = {
   phone: '+91 91212 99800',
   address: 'GWD Global Pvt. Ltd., Madhapur, Hyderabad, Telangana 500081 · GWD Club at VJIT, Hyderabad',
   socials: {
-    instagram: 'https://instagram.com/gwdclub',
+    instagram: 'https://www.instagram.com/gwdclub.vjit/',
     linkedin: 'https://linkedin.com/company/gwd-global',
     twitter: 'https://twitter.com/gwdclub',
     github: 'https://github.com/gwdclub',

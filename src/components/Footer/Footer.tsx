@@ -77,7 +77,7 @@ export default function Footer() {
 
             <div className={styles.socials} aria-label="Official Social Channels">
               <a
-                href={settings.instagram || 'https://instagram.com/gwdclub'}
+                href={settings.instagram || 'https://www.instagram.com/gwdclub.vjit/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.socialBtn}
